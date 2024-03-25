@@ -7,16 +7,27 @@
   "author": "pintocuru",
   "license": "GPL-2.0",
   "scripts": {
-    "start": "chcp 65001 && electron .",
+    "start": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make"
   },
   "private": true,
   "config": {
     "forge": {
-      "packagerConfig": {
-        "noFuses": true
-      }
+      "makers": [
+        {
+          "name": "@electron-forge/maker-squirrel",
+          "config": {}
+        }
+      ],
+      "publishers": [
+        {
+          "name": "@electron-forge/publisher-github",
+          "config": {
+            "repository": "your-github-repository"
+          }
+        }
+      ]
     }
   },
   "devDependencies": {
@@ -26,6 +37,7 @@
     "@electron-forge/maker-squirrel": "^7.3.1",
     "@electron-forge/maker-zip": "^7.3.1",
     "@electron-forge/plugin-auto-unpack-natives": "^7.3.1",
+    "@electron-forge/plugin-fuses": "^7.3.1",
     "electron": "^29.1.5"
   },
   "dependencies": {
