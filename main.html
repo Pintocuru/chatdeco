@@ -9,13 +9,13 @@
     style-src 'self' https://cdn.jsdelivr.net 'unsafe-inline';
     font-src 'self' https://cdn.jsdelivr.net;
 ">
- <title>チャットデコレーション! v0.3</title>
+ <title>チャットデコレーション! v0.4</title>
  <script src="https://unpkg.com/vue@3.4.19/dist/vue.global.prod.js"></script>
  <script src="https://cdn.jsdelivr.net/npm/vuetify@3.5.8/dist/vuetify.min.js"></script>
  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.10.2/Sortable.min.js"></script>
  <script src="https://cdn.jsdelivr.net/npm/vuedraggable@4.0.2/dist/vuedraggable.umd.min.js"></script>
  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.6/dist/sweetalert2.all.min.js"></script>
- <script src="./_lib/templates.js"></script>
+ <script src="./_lib/ELDERTEMPLATE.js"></script>
  <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vuetify@3.5.8/dist/vuetify.min.css">
  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.6/dist/sweetalert2.min.css">
@@ -1160,7 +1160,8 @@
      }
      return data;
     },
-/*
+
+
     // text/back/gradation:tmpとして配列データを作成
     STYLE2tmp() {
      const objectToArray = obj => Object.keys(obj).map(key => ({ ...obj[key], key }));
@@ -1169,24 +1170,6 @@
      this.tmp.GRADATION = objectToArray(this.DATAOBJ.GRADATION);
      this.tmp.IMAGES = objectToArray(this.DATAOBJ.IMAGES);
     },
-*/
-     STYLE2tmp() {
-       const objectToArray = obj => {
-         const result = [];
-         for (const key in obj) {
-           if (obj.hasOwnProperty(key)) {
-             result.push({ ...obj[key], key });
-           }
-         }
-         return result;
-       };
-
-       this.tmp.TEXTCOLOR = objectToArray(this.DATAOBJ.TEXTCOLOR);
-       this.tmp.BACKCOLOR = objectToArray(this.DATAOBJ.BACKCOLOR);
-       this.tmp.GRADATION = objectToArray(this.DATAOBJ.GRADATION);
-       this.tmp.IMAGES = objectToArray(this.DATAOBJ.IMAGES);
-     },
-
 
     // text/back/gradation:tmpの配列をObjectに戻してDATAOBJに入れる
     tmp2STYLE(style) {
@@ -1619,18 +1602,6 @@
     sumRanValues(num) {
      const total = this.DATAOBJ.BASIC_IMAGES.reduce((sum, obj) => sum + (obj.hasOwnProperty('ran') ? parseInt(obj.ran) : 0), 0);
      return Math.round((num / total) * 100);
-    },
-   },
-
-   watch: {
-    // DATAOBJが変更されたらelectron側に伝えて
-    DATAOBJ: {
-     deep: true,
-     handler(newValue, oldValue) {
-      if (window.electron) {
-       window.electron.objsaveflag(true, JSON.stringify(this.DATAOBJ));
-      }
-     },
     },
    },
   });
