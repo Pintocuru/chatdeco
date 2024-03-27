@@ -34,8 +34,6 @@ const enableAnnounce = preferences.enableAnnounce;
 
 
 
-
-
 // デコレーションセット
 function deco_data(mode, index) {
  // IMAGESデータ呼び出し
@@ -43,22 +41,42 @@ function deco_data(mode, index) {
  // 番外を呼び出そうとしたときはreturn
  if (DECO === undefined) return;
  
- // noneなら空白にする
- const text = TEXTCOLOR[DECO.text].color;
- const back = BACKCOLOR[DECO.back].color;
- const gradation = GRADATION[DECO.gradation].color;
- const imgcheck = IMAGES[key.img].color;
- const img = imgcheck.length !== 0 ? `url('${imgcheck}')` : "";
+ // x_objに当てはめる
+ const t_obj = TEXTCOLOR[DECO.text];
+ const b_obj = BACKCOLOR[DECO.back];
+ const g_obj = GRADATION[DECO.gradation];
+ const i_obj = IMAGES[DECO.img];
+
+ let text = t_obj.color;
+ let back = b_obj.color;
+ let gradation = g_obj.color;
+ const imgcheck = i_obj.color;
+ let img = imgcheck.length !== 0 ? `url('${images_dir}${imgcheck}')` : "";
+
+ // imgのオプション
  const dot = gradation && img ? "," : "";
+
+ const g_positionX = gradation.length !== 0 ? 100 + '%' : "";
+ const g_positionY = gradation.length !== 0 ? 100 + '%' : "";
+ const g_sizeX = gradation.length !== 0 ? 'auto' : "";
+ const g_sizeY = gradation.length !== 0 ? 'auto' : "";
+ const g_repeat = gradation.length !== 0 ? 'no-repeat' : "";
+
+ const i_positionX = img.length !== 0 ? i_obj.positionX + '%' : "";
+ const i_positionY = img.length !== 0 ? i_obj.positionY + '%' : "";
+ const i_sizeX = img.length !== 0 ? i_obj.sizeXauto ? 'auto' : i_obj.sizeX + '%' : "";
+ const i_sizeY = img.length !== 0 ? i_obj.sizeYauto ? 'auto' : i_obj.sizeY + '%' : "";
+ const i_repeat = img.length !== 0 ? i_obj.repeat : "";
 
  return {
   "--lcv-comment-shadow": "none",
   "--lcv-text-color": text,
   "--lcv-background-color": back,
-  backgroundImage: `${img}${dot}${gradation}`,
-  backgroundPosition: "right",
-  backgroundSize: "contain",
-  backgroundRepeat: "no-repeat",
+  backgroundImage: img + dot + gradation,
+  "background-position-x": i_positionX + dot + g_positionX,
+  "background-position-y": i_positionY + dot + g_positionY,
+  backgroundSize: `${i_sizeX} ${i_sizeY} ${dot} ${g_sizeX} ${g_sizeY}`,
+  backgroundRepeat: i_repeat + dot + g_repeat,
  }
 }
 

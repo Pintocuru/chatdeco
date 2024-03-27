@@ -3,7 +3,7 @@
 
 <head>
  <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="
+ <meta http-equiv="Content-Security-Policy" content="
   default-src 'self';
   script-src 'self' https://unpkg.com https://cdn.jsdelivr.net 'unsafe-inline' 'unsafe-eval';
   style-src 'self' https://cdn.jsdelivr.net 'unsafe-inline';
@@ -237,7 +237,7 @@
 
          <!-- キャラクター -->
          <d_images :colors="DATAOBJ.IMAGES" :target="value.img" :btnstyle="getDecorationStyle(value,2)"
-          @selected="handleCOLOR('BASIC_IMAGES',index, 'img', $event)">
+          :images_dir="images_dir" @selected="handleCOLOR('BASIC_IMAGES',index, 'img', $event)">
          </d_images>
 
         </v-row>
@@ -323,7 +323,7 @@
 
          <!-- キャラクター -->
          <d_images :colors="DATAOBJ.IMAGES" :target="value.img" :btnstyle="getDecorationStyle(value,2)"
-          @selected="handleCOLOR('ROLE_IMAGES',index, 'img', $event)">
+          :images_dir="images_dir" @selected="handleCOLOR('ROLE_IMAGES',index, 'img', $event)">
          </d_images>
 
         </v-row>
@@ -415,7 +415,7 @@
 
          <!-- キャラクター -->
          <d_images :colors="DATAOBJ.IMAGES" :target="value.img" :btnstyle="getDecorationStyle(value,2)"
-          @selected="handleCOLOR('USER_IMAGES',index, 'img', $event)">
+          :images_dir="images_dir" @selected="handleCOLOR('USER_IMAGES',index, 'img', $event)">
          </d_images>
 
         </v-row>
@@ -774,7 +774,7 @@
        <v-card variant="outlined" class="mx-auto" max-width="600">
         <v-card-item>
          <v-card-title>アナウンスを有効にする</v-card-title>
-         <v-card-subtitle>#decoが付与されたときにBOTがアナウンスするか</v-card-subtitle>
+         <v-card-subtitle>#decoが付与されたときにBOTがアナウンスします</v-card-subtitle>
         </v-card-item>
         <v-card-text>
          <v-radio-group inline v-model="DATAOBJ.preferences.enableAnnounce">
@@ -822,9 +822,11 @@
   // ライブラリの使用
   const draggable = window['vuedraggable'];
   const vuetify = Vuetify.createVuetify();
+
   const app = Vue.createApp({
    data: () => ({
     tab: 'BASIC_deco', // ナビゲーション BASIC_deco
+    images_dir: "", // 画像ディレクトリ
     selectgridcols: "pattern2", // アイテムの並べ方
     gridcols: {
      pattern1: { name: "pattern1", cols: 12, sm: 12, md: 12, lg: 6, height: 50, icon: "mdi-view-list" },
@@ -994,7 +996,7 @@
 
     // 1-1_1-3:IMAGESコンポーネント
     d_images: {
-     props: ['target', 'colors', 'btnstyle'],
+     props: ['target', 'colors', 'btnstyle', 'images_dir'],
      template: `
 <v-col cols="12" sm="6" md="3">
   <v-menu>
@@ -1004,7 +1006,7 @@
       </v-btn>
     </template>
     <v-list>
-      <v-list-item v-for="(color, key) in colors" :key="key" @click="handleColorClick(key)" :style="{ backgroundImage: 'url(' + colors[key].color + ')', backgroundPosition: 'right', backgroundSize: 'contain', backgroundRepeat: 'no-repeat' }">
+      <v-list-item v-for="(color, key) in colors" :key="key" @click="handleColorClick(key)" :style="{ backgroundImage: 'url(' + images_dir + colors[key].color + ')', backgroundPosition: 'right', backgroundSize: 'contain', backgroundRepeat: 'no-repeat' }">
         <v-list-item-title>{{ color.name }}</v-list-item-title>
       </v-list-item>
     </v-list>
@@ -1087,6 +1089,9 @@
    },
 
    created() {
+    // 画像ディレクトリを返す
+    this.get_images_dir();
+
     // userData.jsがなければテンプレを読む
     if (typeof __USER__DATAOBJ !== 'undefined') {
      // userData.js
@@ -1112,6 +1117,13 @@
    },
 
    methods: {
+    // 画像ディレクトリを返す
+    get_images_dir() {
+     const url = new URL(document.URL);
+     const directory = url.pathname.substring(0, url.pathname.lastIndexOf('/'));
+     this.images_dir = `${directory}./img/`;
+    },
+
     // プリセットデータから読み込む　     
     presetDATAOBJ(Obj) {
      this.DATAOBJ = this.Object2Array(JSON.parse(JSON.stringify(Obj)));
@@ -1142,7 +1154,7 @@
         text: "設定をリセットしたよ",
         icon: "success",
        }).then((result) => {
-         this.tmp_updata()
+        this.tmp_updata()
         tab = 'BASIC_deco';
        });
       }
@@ -1296,7 +1308,7 @@
      let back = b_obj.color;
      let gradation = g_obj.color;
      const imgcheck = i_obj.color;
-     let img = imgcheck.length !== 0 ? `url('${imgcheck}')` : "";
+     let img = imgcheck.length !== 0 ? `url('${this.images_dir}${imgcheck}')` : "";
 
      if (mode === 0) {
       return;
@@ -1368,7 +1380,7 @@
      const sizeX = Obj.sizeXauto ? 'auto' : Obj.sizeX + '%';
      const sizeY = Obj.sizeYauto ? 'auto' : Obj.sizeY + '%';
      return {
-      backgroundImage: mode === 'GRADATION' ? Obj.color : `url(${Obj.color})`,
+      backgroundImage: mode === 'GRADATION' ? Obj.color : `url(${this.images_dir}${Obj.color})`,
       "background-position-x": Obj.positionX + '%',
       "background-position-y": Obj.positionY + '%',
       backgroundSize: `${sizeX} ${sizeY}`,

@@ -29,7 +29,6 @@ const app = Vue.createApp({
    const Style = OneSDK.getCommentStyle(comment);
    if ('--lcv-background-color' in Style) { return Style; }
    // CSSがあるなら付与する
-   console.log(comment.css);
    if (comment.css) { return comment.css; }
   },
   // フォントのサイズ(倍率)を変える
@@ -65,39 +64,41 @@ const app = Vue.createApp({
     let decoKey;
 
     // USER_IMAGES(個別ユーザー)
-    decoKey = USER_IMAGES.find(array => array.username.includes(comment.data.displayName));
+    decoKey = USER_IMAGES.findIndex(array => array.username.includes(comment.data.displayName));
     // decoKeyがあるなら、visitにdecoデータを追加
-    if (decoKey !== undefined) {
-     this.visit[comment.data.userId].deco = deco_data("USER_IMAGES", decoKey);
+    if (decoKey > -1) {
+     this.visit[comment.data.userId].css = deco_data("USER_IMAGES", decoKey);
      return;
     }
 
     // ROLE_IMAGES(ユーザーレベル)
-    const Userlevel = this.getUserlevel(comment.data);
-    decoKey = Object.keys(ROLE_IMAGES).find(key => String(ROLE_IMAGES[key].userlevel) === String(Userlevel));
+    const mylevel = this.getUserlevel(comment.data);
+    decoKey = Object.keys(ROLE_IMAGES).find(key => String(ROLE_IMAGES[key].userlevel) === String(mylevel));
 
-    // decoKeyがあるなら、visitにdecoデータを追加
-    if (decoKey !== undefined) {
-     this.visit[comment.data.userId].deco = deco_data("ROLE_IMAGES", decoKey);
+    // switchがtrueなら、visitにdecoデータを追加
+    if (ROLE_IMAGES[decoKey].switch) {
+     this.visit[comment.data.userId].css = deco_data("ROLE_IMAGES", decoKey);
     }
    }
   },
   // #decoが先頭に付いているなら、デコレーションを付与
   deco2visit(comment, deconumber) {
    // #0なら、USER_IMAGESを参照
-   if (deconumber === 0){
+   if (deconumber === 0) {
     // USER_IMAGES(個別ユーザー)
-    const decoKey = USER_IMAGES.find(array => array.username.includes(comment.data.displayName));
+    const decoKey = USER_IMAGES.findIndex(array => array.username.includes(comment.data.displayName));
     // decoKeyがあるなら、visitにdecoデータを追加
-    if (decoKey !== undefined) {
-     this.visit[comment.data.userId].deco = deco_data("USER_IMAGES", decoKey);
-    }   
+    if (decoKey > -1) {
+     this.visit[comment.data.userId].css = deco_data("USER_IMAGES", decoKey);
+    } else {
+     // データが無ければ""にする
+     this.visit[comment.data.userId].css = ""
+    }
     return;
    }
-
    // 特定のdecoがあればそれを、なければランダムでvisitに格納
-   const decoKey = deconumber ? deconumber : objlottery(BASIC_IMAGES,"key");
-   this.visit[comment.data.userId].deco = deco_data("BASIC_IMAGES", decoKey);
+   const decoKey = deconumber ? deconumber -1 : objlottery(BASIC_IMAGES, "key");
+   this.visit[comment.data.userId].css = deco_data("BASIC_IMAGES", decoKey);
 
 
    // deco変更のアナウンス(直近でなければスキップ、アナウンス自体のデコ変更は告知しない)
@@ -113,10 +114,10 @@ const app = Vue.createApp({
   },
  },
  mounted() {
-  // !decoが有効であることをアナウンス
+  // #decoが有効であることをアナウンス
   if (Userlevel <= 2) {
    const plustalk = Userlevel === 2 ? "モデレーターは、" : Userlevel === 1 ? "メンバーは、" : "";
-   this.post_announce(`${plustalk}このチャット欄に !deco で、デコレーションができるよ。`, 1);
+   this.post_announce(`${plustalk}このチャット欄に #deco で、デコレーションができるよ。`, 1);
   }
   // visitデータを取得
   this.visitfirstget();
@@ -144,11 +145,11 @@ const app = Vue.createApp({
       } else if (checkword.test(comment.data.comment) && this.getUserlevel(comment.data) >= Userlevel) {
        this.deco2visit(comment, "")
        // #の後に数値が入るなら、数値に対応した#decoを適用する
-      } else if (checknumber){
-       this.deco2visit(comment, checknumber)      
+      } else if (checknumber != null) {
+       this.deco2visit(comment, checknumber)
       }
       // decoに合わせたCSSの変更
-      const deco = this.visit[comment.data.userId]?.deco;
+      const deco = this.visit[comment.data.userId]?.css;
       comment.css = deco || "";
       // profileImageがあるなら、アイコンを書き換える
       if (deco?.profileImage) {

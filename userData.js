@@ -2,7 +2,7 @@ const __USER__DATAOBJ = {
  preferences: {
   theme: "light",
   Userlevel: "0",
-  defaultALLdeco: "0",
+  defaultALLdeco: "1",
   enableAnnounce: "1",
  },
  BASIC_IMAGES: [
@@ -45,7 +45,7 @@ const __USER__DATAOBJ = {
  ROLE_IMAGES: {
   everyone: {
    userlevel: 0,
-   switch: true,
+   switch: false,
    name: "だれでも",
    img: "purple",
    text: "none",
@@ -54,7 +54,7 @@ const __USER__DATAOBJ = {
   },
   member: {
    userlevel: 1,
-   switch: true,
+   switch: false,
    name: "メンバー",
    img: "green",
    text: "white",
@@ -63,7 +63,7 @@ const __USER__DATAOBJ = {
   },
   moderator: {
    userlevel: 2,
-   switch: true,
+   switch: false,
    name: "モデレーター",
    img: "blue",
    text: "white",
@@ -122,6 +122,13 @@ const __USER__DATAOBJ = {
    text: "black",
    back: "lime",
    gradation: "user6",
+  },
+  {
+   username: ["アナウンス"],
+   img: "user1",
+   text: "none",
+   back: "none",
+   gradation: "none",
   },
  ],
  TEXTCOLOR: {
@@ -291,7 +298,7 @@ const __USER__DATAOBJ = {
   },
   white: {
    name: "しろ",
-   color: "img/girl03_spacesuit01.gif",
+   color: "girl03_spacesuit01.gif",
    key: "white",
    positionX: 100,
    positionY: 70,
@@ -303,7 +310,7 @@ const __USER__DATAOBJ = {
   },
   black: {
    name: "くろ",
-   color: "img/boy06_ninja01.gif",
+   color: "boy06_ninja01.gif",
    key: "black",
    positionX: 100,
    positionY: 70,
@@ -315,7 +322,7 @@ const __USER__DATAOBJ = {
   },
   red: {
    name: "あか",
-   color: "img/boy01_cap01.gif",
+   color: "boy01_cap01.gif",
    key: "red",
    positionX: 100,
    positionY: 70,
@@ -327,7 +334,7 @@ const __USER__DATAOBJ = {
   },
   orange: {
    name: "おれんじ",
-   color: "img/corn01_red01.gif",
+   color: "corn01_red01.gif",
    key: "orange",
    positionX: 100,
    positionY: 0,
@@ -339,7 +346,7 @@ const __USER__DATAOBJ = {
   },
   yellow: {
    name: "きいろ",
-   color: "img/boy05_bee01.gif",
+   color: "boy05_bee01.gif",
    key: "yellow",
    positionX: 100,
    positionY: 70,
@@ -351,7 +358,7 @@ const __USER__DATAOBJ = {
   },
   green: {
    name: "みどり",
-   color: "img/girl07_longhair02.gif",
+   color: "girl07_longhair02.gif",
    key: "green",
    positionX: 100,
    positionY: 70,
@@ -363,7 +370,7 @@ const __USER__DATAOBJ = {
   },
   aqua: {
    name: "みずいろ",
-   color: "img/mashroom02_red01.gif",
+   color: "mashroom02_red01.gif",
    key: "aqua",
    positionX: 100,
    positionY: 90,
@@ -375,7 +382,7 @@ const __USER__DATAOBJ = {
   },
   blue: {
    name: "あお",
-   color: "img/girl02_longhair01.gif",
+   color: "girl02_longhair01.gif",
    key: "blue",
    positionX: 100,
    positionY: 100,
@@ -387,7 +394,7 @@ const __USER__DATAOBJ = {
   },
   purple: {
    name: "むらさき",
-   color: "img/girl09_witch02.gif",
+   color: "girl09_witch02.gif",
    key: "purple",
    positionX: 100,
    positionY: 70,
@@ -399,7 +406,7 @@ const __USER__DATAOBJ = {
   },
   pink: {
    name: "ぴんく",
-   color: "img/boy09_cat02.gif",
+   color: "boy09_cat02.gif",
    key: "pink",
    positionX: 100,
    positionY: 70,
@@ -409,12 +416,17 @@ const __USER__DATAOBJ = {
    sizeY: 100,
    sizeYauto: true,
   },
- },
- IMAGES_STYLE: {
-  positionX: 50,
-  positionY: 50,
-  repeat: "no-repeat",
-  sizeX: 100,
-  sizeY: 100,
+  user1: {
+   name: "アナウンス",
+   color: "info.png",
+   key: "user1",
+   positionX: 100,
+   positionY: "40",
+   repeat: "no-repeat",
+   sizeX: 100,
+   sizeXauto: true,
+   sizeY: 100,
+   sizeYauto: true,
+  },
  },
 };
