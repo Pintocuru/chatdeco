@@ -6,30 +6,34 @@
 #deco または#1(数値) で、このチャットにデコレーションができます。
 */
 
-
-// #decoでデコレーションできる権限(0:だれでも 1:メンバー以上 2:モデレーター以上 3:配信者のみ 4:!deco機能OFF)
-const Userlevel = DATAOBJ.preferences.Userlevel;
-
-// チャットした全員にデフォルトでデコを付与する(0:OFF 1:ON 2:毎回ランダムにする)
-const defaultALLdeco = DATAOBJ.preferences.defaultALLdeco;
-
-// アナウンスを有効にするか(デコレーションした時に告知が入ります)
-// 0:OFF 1:最初のアナウンスのみ 2:ON
-const enableAnnounce = DATAOBJ.preferences.enableAnnounce;
+// userData.js から読み込む
+const preferences = __USER__DATAOBJ.preferences;
+const BASIC_IMAGES = __USER__DATAOBJ.BASIC_IMAGES
+const ROLE_IMAGES = __USER__DATAOBJ.ROLE_IMAGES
+const USER_IMAGES = __USER__DATAOBJ.USER_IMAGES
+const TEXTCOLOR = __USER__DATAOBJ.TEXTCOLOR
+const BACKCOLOR = __USER__DATAOBJ.BACKCOLOR
+const GRADATION = __USER__DATAOBJ.GRADATION
+const IMAGES = __USER__DATAOBJ.IMAGES
 
 // 画像ディレクトリ
 const url = new URL(document.URL);
 const directory = url.pathname.substring(0, url.pathname.lastIndexOf('/'));
-const images_dir = `${directory}./`;
+const images_dir = `${directory}./img/`;
 
-// #deco
-const BASIC_IMAGES = DATAOBJ.BASIC_IMAGES
-const ROLE_IMAGES = DATAOBJ.ROLE_IMAGES
-const USER_IMAGES = DATAOBJ.USER_IMAGES
-const TEXTCOLOR = DATAOBJ.TEXTCOLOR
-const BACKCOLOR = DATAOBJ.BACKCOLOR
-const GRADATION = DATAOBJ.GRADATION
-const IMAGES = DATAOBJ.IMAGES
+
+// #decoでデコレーションできる権限(0:だれでも 1:メンバー以上 2:モデレーター以上 3:配信者のみ 4:!deco機能OFF)
+const Userlevel = preferences.Userlevel;
+
+// チャットした全員にデフォルトでデコを付与する(0:OFF 1:ON 2:毎回ランダムにする)
+const defaultALLdeco = preferences.defaultALLdeco;
+
+// アナウンスを有効にするか(デコレーションした時に告知が入ります)
+// 0:OFF 1:最初のアナウンスのみ 2:ON
+const enableAnnounce = preferences.enableAnnounce;
+
+
+
 
 
 // デコレーションセット
@@ -62,11 +66,11 @@ function deco_data(mode, index) {
 function getIMAGES(mode) {
  switch (mode) {
   case 'BASIC_IMAGES':
-   return DATAOBJ.BASIC_IMAGES;
+   return BASIC_IMAGES;
   case 'ROLE_IMAGES':
-   return DATAOBJ.ROLE_IMAGES;
+   return ROLE_IMAGES;
   case 'USER_IMAGES':
-   return DATAOBJ.USER_IMAGES;
+   return USER_IMAGES;
   default:
    throw new Error(`Invalid mode: ${mode}`);
  }

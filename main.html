@@ -3,11 +3,12 @@
 
 <head>
  <meta charset="UTF-8">
- <meta http-equiv="Content-Security-Policy" content="
-    default-src 'self';
-    script-src 'self' https://unpkg.com https://cdn.jsdelivr.net 'unsafe-inline' 'unsafe-eval';
-    style-src 'self' https://cdn.jsdelivr.net 'unsafe-inline';
-    font-src 'self' https://cdn.jsdelivr.net;
+<meta http-equiv="Content-Security-Policy" content="
+  default-src 'self';
+  script-src 'self' https://unpkg.com https://cdn.jsdelivr.net 'unsafe-inline' 'unsafe-eval';
+  style-src 'self' https://cdn.jsdelivr.net 'unsafe-inline';
+  font-src 'self' https://cdn.jsdelivr.net;
+  img-src 'self' data:;
 ">
  <title>チャットデコレーション! v0.4</title>
  <script src="https://unpkg.com/vue@3.4.19/dist/vue.global.prod.js"></script>
@@ -16,6 +17,7 @@
  <script src="https://cdn.jsdelivr.net/npm/vuedraggable@4.0.2/dist/vuedraggable.umd.min.js"></script>
  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.6/dist/sweetalert2.all.min.js"></script>
  <script src="./_lib/ELDERTEMPLATE.js"></script>
+ <script src="./userData.js"></script>
  <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vuetify@3.5.8/dist/vuetify.min.css">
  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.6/dist/sweetalert2.min.css">
@@ -67,14 +69,6 @@
        <v-row>
         <!-- わんコメテンプレ選択 -->
         <v-col cols="4" sm="auto">
-         <input type="file" accept=".json" ref="fileInput" style="display: none" @change="jsonOpenChange">
-         <v-btn variant="elevated" @click="$refs.fileInput.click()">
-          <v-icon>mdi-file-document</v-icon>
-          読み込む
-         </v-btn>
-        </v-col>
-        <!-- わんコメテンプレ選択 -->
-        <v-col cols="4" sm="auto">
          <v-menu>
           <template v-slot:activator="{ props }">
            <v-btn v-bind="props">▼ {{ OnecomeSelect }}</v-btn>
@@ -88,9 +82,9 @@
         </v-col>
         <!-- テンプレートを生成するボタン -->
         <v-col cols="4" sm="auto">
-         <v-btn variant="elevated" color="primary" @click="outputTemplate">
+         <v-btn variant="elevated" color="primary" @click="dialog[99] = true">
           <v-icon>mdi-content-save</v-icon>
-          生成
+          保存
          </v-btn>
         </v-col>
        </v-row>
@@ -124,6 +118,45 @@
       </v-row>
      </v-col>
     </v-row>
+    <!-- ダウンロード用ダイアログ -->
+    <v-dialog v-model="dialog[99]" max-width="800">
+     <v-card height="600">
+      <v-container class="text-center row-gap-4">
+
+       <v-img max-height="120" :src=`./img/${imgRandom()}` v-show="OnecomeSelect === 'json'"></v-img>
+       <v-img max-height="120" :src="Onecometemplate[OnecomeSelect].img" v-show="OnecomeSelect !== 'json'"></v-img>
+       <p class="text-h3 py-4">ダウンロード</p>
+       <p class="pb-4">
+        クリックで userData.js をダウンロードして、<br>
+        main.htmlと同じフォルダに入れてね。<br>
+       </p>
+       <v-btn block color="primary" @click="outputTemplate()" style="text-transform: none;">
+        userData.js を ダウンロード!
+       </v-btn>
+       <p class="pb-8"> </p>
+
+       <v-row v-show="OnecomeSelect !== 'json'">
+        <v-col cols="12">
+         下記の3つのファイルは、<br>
+         右クリックから「名前を付けてリンク先を保存」を選択して、<br>
+         main.htmlと同じフォルダに入れてね。<br>
+        </v-col>
+        <v-col>
+         <d_downloadlink :directory=`${OnecomeSelect}_deco` filename="index.html"></d_downloadlink>
+        </v-col>
+        <v-col>
+         <d_downloadlink directory="basic_deco" filename="style.css"></d_downloadlink>
+        </v-col>
+        <v-col>
+         <d_downloadlink directory="basic_deco" filename="thumb.png"></d_downloadlink>
+        </v-col>
+       </v-row>
+
+      </v-container>
+     </v-card>
+
+
+    </v-dialog>
 
 
     <!-- 1-1.BASIC_deco -->
@@ -355,8 +388,8 @@
            <v-icon>mdi-close</v-icon>
           </v-btn>
          </v-col>
-         <v-col class="d-flex" cols="12" sm="6" md="4">
-          <v-btn v-if="value.username.length < 10" block @click="value.username.push('')">追加</v-btn>
+         <v-col class="d-flex pb-8" cols="12" sm="6" md="4">
+          <v-btn v-if="value.username.length < 10" block color="secondary" @click="value.username.push('')">追加</v-btn>
          </v-col>
         </v-row>
 
@@ -788,9 +821,7 @@
  <script>
   // ライブラリの使用
   const draggable = window['vuedraggable'];
-  const vuetify = Vuetify.createVuetify({
-   // テーマ：theme: { defaultTheme: 'light' }
-  });
+  const vuetify = Vuetify.createVuetify();
   const app = Vue.createApp({
    data: () => ({
     tab: 'BASIC_deco', // ナビゲーション BASIC_deco
@@ -807,7 +838,7 @@
     // わんコメテンプレート
     OnecomeSelect: "json",
     Onecometemplate: {
-     "json": { "name": "(jsonのみ)", "img": "./_lib/basic_deco/thumb.png" },
+     "json": { "name": "json", "img": "./_lib/basic_deco/thumb.png" },
      "basic": { "name": "basic", "img": "./_lib/basic_deco/thumb.png" },
      "cool-pop": { "name": "cool-pop", "img": "./_lib/cool-pop_deco/thumb.png" },
      "diagonal-right": { "name": "diagonal-right", "img": "./_lib/diagonal-right_deco/thumb.png" },
@@ -823,29 +854,8 @@
      GRADATION: ELDERTEMPLATE.GRADATION,
      IMAGES: ELDERTEMPLATE.IMAGES,
     },
-
-    // __user__.jsに記入する内容
-    DATAOBJ: {
-     preferences: {
-      "theme": "light",
-      "Userlevel": "0",
-      "defaultALLdeco": "0",
-      "enableAnnounce": "1"
-     },
-     BASIC_IMAGES: [],
-     ROLE_IMAGES: {},
-     USER_IMAGES: [],
-     TEXTCOLOR: {},
-     BACKCOLOR: {},
-     GRADATION: {},
-     IMAGES: {},
-    },
-    tmp: {
-     TEXTCOLOR: [],
-     BACKCOLOR: [],
-     GRADATION: [],
-     IMAGES: [],
-    },
+    DATAOBJ: {},
+    tmp: {},
    }),
 
    components: {
@@ -879,6 +889,24 @@
     </v-toolbar>
     <br>
   `,
+    },
+
+
+    // 保存:ファイルをダウンロードするボタン
+    d_downloadlink: {
+     props: ['directory', 'filename'],
+     template: `
+     <v-card :href="filePath" target="_blank">
+      <v-toolbar density="compact" variant="elevated" color="secondary">
+       <v-toolbar-title class="text-h6">{{ filename }}</v-toolbar-title>
+      </v-toolbar>
+     </v-card>
+ `,
+     computed: {
+      filePath() {
+       return `_lib/${this.directory}/${this.filename}`;
+      }
+     }
     },
 
 
@@ -1059,20 +1087,26 @@
    },
 
    created() {
-    // electronが動いていないなら、デバッグモード
-    if (!window.electron) {
-     this.presetDATAOBJ(ELDERTEMPLATE)
+    // userData.jsがなければテンプレを読む
+    if (typeof __USER__DATAOBJ !== 'undefined') {
+     // userData.js
+     this.presetDATAOBJ(__USER__DATAOBJ)
+     Swal.fire({
+      imageUrl: `./img/${this.imgRandom()}`,
+      imageAlt: "チャットデコレーション!",
+      title: "userData.js を読み込んだよ",
+      text: "カスタムデータをセットしたよ",
+      focusConfirm: false,
+     });
     } else {
-     // 読み込んだ__user__.json、またはプリセットデータを入れる
-     window.electron.getDATAOBJ().then(electrondata => {
-      if (Object.keys(electrondata).length !== 0) {
-       this.DATAOBJ = this.Object2Array(electrondata);
-       // text/back/gradation/img をtmpとして配列に変換
-       this.STYLE2tmp();
-      } else {
-       // {}空ならプリセットデータを読む
-       this.presetDATAOBJ(ELDERTEMPLATE)
-      }
+     // 初期起動、またはuserData.jsなし
+     this.presetDATAOBJ(ELDERTEMPLATE)
+     Swal.fire({
+      imageUrl: `./img/${this.imgRandom()}`,
+      imageAlt: "Custom image",
+      title: "Welcome to チャットデコレーション!",
+      text: "初期設定をセットしたよ。カスタムデータは、main.htmlと同じディレクトリに userData.jsを置いてね。",
+      focusConfirm: false,
      });
     }
    },
@@ -1100,31 +1134,16 @@
       denyButtonColor: "",
      }).then((result) => {
       if (result.isConfirmed) {
+       // ELDERTEMPLATE をプリセットデータに入れる
+       this.presetDATAOBJ(ELDERTEMPLATE)
+       // リセットしたことを報告
        Swal.fire({
-        title: `設定をリセットする`,
-        text: "本当によろしいですか？元には戻せませんよ。",
-        icon: "warning",
-        // 1番目ボタン
-        confirmButtonText: "リセットする",
-        confirmButtonColor: "",
-        // 2番目ボタン
-        showDenyButton: true,
-        denyButtonText: "やっぱりやめる",
-        denyButtonColor: "",
-       }).then((result2) => {
-        // デコレーション：   
-        if (result2.isConfirmed) {
-         // ELDERTEMPLATE をプリセットデータに入れる
-         this.presetDATAOBJ(ELDERTEMPLATE)
-         // リセットしたことを報告
-         Swal.fire({
-          title: `リセット!`,
-          text: "設定をリセットしたよ",
-          icon: "success",
-         }).then((result3) => {
-          window.location.reload();
-         });
-        }
+        title: `リセット!`,
+        text: "設定をリセットしたよ",
+        icon: "success",
+       }).then((result) => {
+         this.tmp_updata()
+        tab = 'BASIC_deco';
        });
       }
      });
@@ -1183,119 +1202,6 @@
      this.DATAOBJ[style] = resultObject;
     },
 
-    // jsonファイルを読み込み、設定を変更するかカラーデータを入れ替える
-    jsonOpenChange(event) {
-     // ファイル未記入ならreturn
-     const selectedFile = event.target.files[0];
-     if (!selectedFile) return;
-     // ファイルをどちらで読み込ませるかを聞く
-     let mode;
-     Swal.fire({
-      title: `${selectedFile.name} を読み込む`,
-      icon: "info",
-      // 1番目ボタン
-      confirmButtonText: "#decoの変更",
-      confirmButtonColor: "#3F51B5",
-      // 2番目ボタン
-      showDenyButton: true,
-      denyButtonColor: "#009688",
-      denyButtonText: "カラーテンプレートの変更",
-      // 3番目ボタン
-      showCancelButton: true,
-      cancelButtonColor: "",
-      cancelButtonText: "キャンセル",
-     }).then((result) => {
-      // デコレーション：
-      if (result.isConfirmed) {
-       mode = 1;
-      } else if (result.isDenied) {
-       mode = 2;
-      } else {
-       return;
-      }
-      // ファイルの内容をメインに読んでもらう
-      window.electron.jsonfile_readme(selectedFile)
-       .then((jsondata) => {
-        // データの整合性チェック
-        const parsedData = JSON.parse(jsondata);
-        const requiredKeys = ['preferences', 'BASIC_IMAGES', 'ROLE_IMAGES', 'USER_IMAGES', 'TEXTCOLOR', 'BACKCOLOR', 'GRADATION', 'IMAGES'];
-        const missingKeys = requiredKeys.filter(key => {
-         const value = parsedData[key];
-         return !Array.isArray(value) && typeof value !== 'object';
-        });
-        if (missingKeys.length !== 0) {
-         Swal.fire("ファイルが読み込めませんでした。", "ファイルが破損してます", "error");
-         return;
-        }
-        // デコレーション(DATAOBJ)を変更
-        if (mode === 1) {
-         Swal.fire({
-          title: `${selectedFile.name} を適用する`,
-          text: "編集中のデータは消えてしまいますがよろしいですか？",
-          icon: "warning",
-          // 1番目ボタン
-          confirmButtonText: "デコレーション!",
-          confirmButtonColor: "",
-          // 2番目ボタン
-          showDenyButton: true,
-          denyButtonText: "やめる",
-          denyButtonColor: "",
-          // 3番目ボタン
-          showCancelButton: true,
-          cancelButtonText: "キャンセル",
-          cancelButtonColor: "",
-         }).then((result) => {
-          // デコレーション：   
-          if (result.isConfirmed) {
-           // DATAOBJにセット
-           this.presetDATAOBJ(parsedData)
-           window.location.reload();
-          }
-         });
-         // パレットを変更
-        } else if (mode === 2) {
-         Swal.fire({
-          title: `${selectedFile.name} を適用する`,
-          text: "パレットのテンプレート（＋追加ボタンの内容）を変更します。よろしいですか?",
-          icon: "warning",
-          // 1番目ボタン
-          confirmButtonText: "テンプレート変更!",
-          confirmButtonColor: "",
-          // 2番目ボタン
-          showDenyButton: true,
-          denyButtonColor: "",
-          denyButtonText: "やめる",
-          // 3番目ボタン
-          showCancelButton: true,
-          cancelButtonColor: "",
-          cancelButtonText: "キャンセル",
-         }).then((result) => {
-          // デコレーション：   
-          if (result.isConfirmed) {
-           // TEMPLATEOBJにセット
-           this.TEMPLATEOBJ = this.Object2Array(JSON.parse(JSON.stringify(parsedData)));
-           // 変更完了
-           Swal.fire({
-            title: "変更完了!",
-            text: "新しいパレットが使えるようになったよ。＋追加から追加してね。",
-            icon: "success"
-           });
-          }
-         });
-
-        }
-
-       })
-       .catch((err) => {
-        console.error(err);
-        Swal.fire("ファイルが読み込めませんでした。", "読み込みエラー", "error");
-        return;
-       });
-     });
-
-
-    },
-
 
     //// ファイル更新
     // tmpを更新、JSONを書き足す
@@ -1307,52 +1213,18 @@
     },
 
     //// テンプレートファイル書き出し  
-    async outputTemplate() {
-     // テンプレート未選択ならreturn
-     if (this.OnecomeSelect.includes("テンプレート")) {
-      Swal.fire({
-       icon: "error",
-       title: "テンプレートが選択されてないよ",
-       text: "テンプレートを選択してください",
-      });
-      return;
-     } else if (this.OnecomeSelect.includes("jsonのみ")) {
-      // json出力ならダイアログを出して保存させる
-      const jsonDataString = JSON.stringify(this.DATAOBJ);
-      const blob = new Blob([jsonDataString], { type: 'application/json' });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'decoration.json';
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-     } else {
-      // わんコメテンプレートを出力する
-      const temp = this.OnecomeSelect
-      Swal.fire({
-       title: `テンプレートを出力する`,
-       text: `「${temp}」テンプレートを出力しますか？`,
-       icon: "info",
-       // 1番目ボタン
-       confirmButtonText: "出力する!",
-       confirmButtonColor: "",
-       // 2番目ボタン
-       showDenyButton: true,
-       denyButtonText: "キャンセル",
-       denyButtonColor: "",
-      }).then((result) => {
-       // デコレーション：   
-       if (result.isConfirmed) {
-        try {
-         window.electron.makeTemplate(temp);
-        } catch (error) {
-         console.error('Error making template:', error);
-        }
-       }
-      });
-     }
+    outputTemplate() {
+     // jsファイルを出力
+     const jsonDataString = "const __USER__DATAOBJ =" + JSON.stringify(this.DATAOBJ);
+     const blob = new Blob([jsonDataString], { type: 'application/javascript' });
+     const url = window.URL.createObjectURL(blob);
+     const a = document.createElement('a');
+     a.href = url;
+     a.download = 'userData.js';
+     document.body.appendChild(a);
+     a.click();
+     window.URL.revokeObjectURL(url);
+     document.body.removeChild(a);
     },
 
     //// ファイル呼び出し
@@ -1378,6 +1250,21 @@
      }
     },
 
+
+    // ランダムで画像を返す
+    imgRandom() {
+     const images = [
+      'boy01_cap01.gif',
+      'boy05_bee01.gif',
+      'boy06_ninja01.gif',
+      'boy09_cat02.gif',
+      'girl02_longhair01.gif',
+      'girl03_spacesuit01.gif',
+      'girl07_longhair02.gif',
+      'girl09_witch02.gif'
+     ];
+     return images[(Math.random() * images.length) | 0];
+    },
 
     //// 設定画面表示
     // 設定に合わせたデコレーションの付与
@@ -1489,18 +1376,10 @@
      };
     },
 
-    // electronから相対パスを取得
+    // ファイル名を取得
     getRelative(event, mode, index) {
-     const targetImages = this.getIMAGES(mode);
-     const absPath = event.target.files[0].path; // ファイルの絶対パスを取得
-     // メインプロセスで相対パスを取得
-     window.electron.getRelative(absPath)
-      .then((relative) => {
-       targetImages[index].color = relative.replace(/\\/g, '/'); // ファイルの相対パスを設定
-      })
-      .catch((err) => {
-       console.error(err);
-      });
+     const target = this.getIMAGES(mode);
+     target[index].color = event.target.files[0].name; // ファイル名を取得
     },
 
     // TEXT/BACK/GRADATION/IMAGES:Objectをテンプレートから選択して追加
