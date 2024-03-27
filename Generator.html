@@ -82,7 +82,7 @@
         </v-col>
         <!-- テンプレートを生成するボタン -->
         <v-col cols="4" sm="auto">
-         <v-btn variant="elevated" color="primary" @click="dialog[99] = true">
+         <v-btn variant="elevated" color="primary" @click="dialog[55] = true">
           <v-icon>mdi-content-save</v-icon>
           保存
          </v-btn>
@@ -119,36 +119,38 @@
      </v-col>
     </v-row>
     <!-- ダウンロード用ダイアログ -->
-    <v-dialog v-model="dialog[99]" max-width="800">
+    <v-dialog v-model="dialog[55]" max-width="800">
      <v-card height="600">
       <v-container class="text-center row-gap-4">
 
-       <v-img max-height="120" :src=`./img/${imgRandom()}` v-show="OnecomeSelect === 'json'"></v-img>
-       <v-img max-height="120" :src="Onecometemplate[OnecomeSelect].img" v-show="OnecomeSelect !== 'json'"></v-img>
+       <v-img max-height="120" :src=`./img/${imgRandom()}`
+        v-show="OnecomeSelect.includes('設定') || OnecomeSelect.includes('テンプレ')"></v-img>
+       <v-img max-height="120" :src="Onecometemplate[OnecomeSelect].img"
+        v-show="!OnecomeSelect.includes('設定') && !OnecomeSelect.includes('テンプレ')"></v-img>
        <p class="text-h3 py-4">ダウンロード</p>
        <p class="pb-4">
         クリックで userData.js をダウンロードして、<br>
-        main.htmlと同じフォルダに入れてね。<br>
+        Generator.htmlと同じフォルダに入れてね。<br>
        </p>
        <v-btn block color="primary" @click="outputTemplate()" style="text-transform: none;">
         userData.js を ダウンロード!
        </v-btn>
        <p class="pb-8"> </p>
 
-       <v-row v-show="OnecomeSelect !== 'json'">
+       <v-row v-show="!OnecomeSelect.includes('設定') && !OnecomeSelect.includes('テンプレ')">
         <v-col cols="12">
          下記の3つのファイルは、<br>
          右クリックから「名前を付けてリンク先を保存」を選択して、<br>
-         main.htmlと同じフォルダに入れてね。<br>
+         Generator.htmlと同じフォルダに入れてね。<br>
         </v-col>
         <v-col>
          <d_downloadlink :directory=`${OnecomeSelect}_deco` filename="index.html"></d_downloadlink>
         </v-col>
         <v-col>
-         <d_downloadlink directory="basic_deco" filename="style.css"></d_downloadlink>
+         <d_downloadlink :directory=`${OnecomeSelect}_deco` filename="style.css"></d_downloadlink>
         </v-col>
         <v-col>
-         <d_downloadlink directory="basic_deco" filename="thumb.png"></d_downloadlink>
+         <d_downloadlink :directory=`${OnecomeSelect}_deco` filename="thumb.png"></d_downloadlink>
         </v-col>
        </v-row>
 
@@ -457,7 +459,8 @@
        <v-col v-show="element.key !== 'none'" :cols="gridcols[selectgridcols].cols" :sm="gridcols[selectgridcols].sm"
         :md="gridcols[selectgridcols].md" :lg="gridcols[selectgridcols].lg">
         <v-card variant="outlined" :height="gridcols[selectgridcols].height" @click="dialog[index] = true">
-         <d_list_toolbar :element="element" @clearbtn="clearImageArr('TEXTCOLOR', element,index)"></d_list_toolbar>
+         <d_list_toolbar :element="element" @clearbtn="clearImageArr('TEXTCOLOR', element,index)">
+         </d_list_toolbar>
          <div class="text-h3" :style="{color:element.color,position: 'absolute', bottom: '5px', right: '5px'}">
           <v-icon>mdi-pencil</v-icon>
          </div>
@@ -521,7 +524,8 @@
         :md="gridcols[selectgridcols].md" :lg="gridcols[selectgridcols].lg">
         <v-card variant="outlined" :height="gridcols[selectgridcols].height" :style="{ backgroundColor: element.color }"
          @click="dialog[index] = true">
-         <d_list_toolbar :element="element" @clearbtn="clearImageArr('BACKCOLOR', element,index)"></d_list_toolbar>
+         <d_list_toolbar :element="element" @clearbtn="clearImageArr('BACKCOLOR', element,index)">
+         </d_list_toolbar>
 
         </v-card>
        </v-col>
@@ -582,7 +586,8 @@
         :md="gridcols[selectgridcols].md" :lg="gridcols[selectgridcols].lg">
         <v-card variant="outlined" :height="gridcols[selectgridcols].height"
          :style="getBackgroundStyle(element,'GRADATION')" @click="dialog[index] = true">
-         <d_list_toolbar :element="element" @clearbtn="clearImageArr('GRADATION',element, index)"></d_list_toolbar>
+         <d_list_toolbar :element="element" @clearbtn="clearImageArr('GRADATION',element, index)">
+         </d_list_toolbar>
 
         </v-card>
        </v-col>
@@ -643,7 +648,8 @@
         :md="gridcols[selectgridcols].md" :lg="gridcols[selectgridcols].lg">
         <v-card variant="outlined" :height="gridcols[selectgridcols].height"
          :style="getBackgroundStyle(element,'IMAGES')" @click="dialog[index] = true">
-         <d_list_toolbar :element="element" @clearbtn="clearImageArr('IMAGES', element,index)"></d_list_toolbar>
+         <d_list_toolbar :element="element" @clearbtn="clearImageArr('IMAGES', element,index)">
+         </d_list_toolbar>
 
         </v-card>
        </v-col>
@@ -814,6 +820,7 @@
    <!-- スナックバー表示 -->
    <v-snackbar v-model="snackbar.clear" :timeout="2000">削除したよ。</v-snackbar>
    <v-snackbar v-model="snackbar.new" :timeout="2000">新しく追加したよ。</v-snackbar>
+   <v-snackbar v-model="snackbar.newstop" :timeout="2000">これ以上新しく追加できないよ。</v-snackbar>
   </v-app>
  </div>
 
@@ -833,14 +840,15 @@
      pattern2: { name: "pattern2", cols: 12, sm: 6, md: 4, lg: 3, height: 100, icon: "mdi-view-grid" },
      pattern3: { name: "pattern3", cols: 4, sm: 3, md: 2, lg: 1, height: 100, icon: "mdi-view-module" },
     },
-    snackbar: { copy: false, clear: false, new: false, }, // スナックバー
-    dialog: Array(99).fill(false), // ダイアログ
+    snackbar: { copy: false, clear: false, new: false, newstop: false }, // スナックバー
+    dialog: Array(60).fill(false), // ダイアログ
     repeatOptions: ['repeat', 'no-repeat', 'repeat-x', 'repeat-y'], // 背景画像の選択肢
 
     // わんコメテンプレート
-    OnecomeSelect: "json",
+    OnecomeSelect: "テンプレートを選択",
     Onecometemplate: {
-     "json": { "name": "json", "img": "./_lib/basic_deco/thumb.png" },
+     "テンプレートを選択": { "name": "テンプレートを選択", "img": "./_lib/basic_deco/thumb.png" },
+     "(設定ファイルのみ)": { "name": "(設定ファイルのみ)", "img": "./_lib/basic_deco/thumb.png" },
      "basic": { "name": "basic", "img": "./_lib/basic_deco/thumb.png" },
      "cool-pop": { "name": "cool-pop", "img": "./_lib/cool-pop_deco/thumb.png" },
      "diagonal-right": { "name": "diagonal-right", "img": "./_lib/diagonal-right_deco/thumb.png" },
@@ -1110,7 +1118,7 @@
       imageUrl: `./img/${this.imgRandom()}`,
       imageAlt: "Custom image",
       title: "Welcome to チャットデコレーション!",
-      text: "初期設定をセットしたよ。カスタムデータは、main.htmlと同じディレクトリに userData.jsを置いてね。",
+      text: "初期設定をセットしたよ。カスタムデータは、Generator.htmlと同じディレクトリに userData.jsを置いてね。",
       focusConfirm: false,
      });
     }
@@ -1425,9 +1433,14 @@
        template.key = newKey;
        // テンプレートを追加
        const sourceArray = this.getIMAGES(mode);
-       sourceArray.splice(1, 0, template);
-       this.tmp_updata(); // tmp->DATAOBJへ更新
-       this.snackbar.new = true; // snackbarを表示
+       if (sourceArray.length < 50) {
+        sourceArray.splice(1, 0, template);
+        this.tmp_updata(); // tmp->DATAOBJへ更新
+        this.snackbar.new = true; // snackbarを表示
+       } else {
+        this.tmp_updata(); // tmp->DATAOBJへ更新
+        this.snackbar.newstop = true; // snackbarを表示 
+       }
       }
      });
     },
@@ -1455,8 +1468,12 @@
      }
      // テンプレートを追加
      const sourceArray = this.getIMAGES(mode);
-     sourceArray.unshift(template)
-     this.snackbar.new = true; // snackbarを表示
+     if (sourceArray.length < 50) {
+      sourceArray.unshift(template);
+      this.snackbar.new = true; // snackbarを表示
+     } else {
+      this.snackbar.newstop = true; // snackbarを表示     
+     }
     },
 
     // BASIC/USER/TEXT/BACK/GRADATION/IMAGES:Objectからプロパティを削除
