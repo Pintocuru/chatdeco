@@ -1,4 +1,4 @@
-const __USER__DATAOBJ = {
+const __USER__DATAOBJ2 = {
  preferences: {
   theme: "light",
   Userlevel: "0",
