@@ -1,432 +1,161 @@
-const __USER__DATAOBJ2 = {
- preferences: {
-  theme: "light",
-  Userlevel: "0",
-  defaultALLdeco: "1",
-  enableAnnounce: "1",
- },
- BASIC_IMAGES: [
-  { ran: 1, img: "white", text: "black", back: "white", gradation: "white" },
-  { ran: 1, img: "black", text: "white", back: "black", gradation: "black" },
-  { ran: 1, img: "red", text: "white", back: "red", gradation: "red" },
-  {
-   ran: 1,
-   img: "orange",
-   text: "white",
-   back: "orange",
-   gradation: "orange",
+const __USER__DATAOBJ = {
+  PREFERENCES: {
+    theme: "dark",
+    testSwitch: 0,// テストスイッチ
+    activeFrameId: "",// 投稿する枠のID
+    basicdelay: 1500,// コメントしてからBotが反応するまでの遅延
+    posttime_min: 5,// 定期botがメッセージを話す間隔(分)
+    day: 7,// 「久しぶり」と反応する日数
   },
-  {
-   ran: 1,
-   img: "yellow",
-   text: "black",
-   back: "yellow",
-   gradation: "yellow",
+  CHARACTER: {
+    "ゆっくり霊夢": { key: "ゆっくり霊夢", defaultchara: "!reimu01", icon: "../../custom/FirstCounter/icon_reimu.png", "--lcv-name-color": "#FFC107", "--lcv-text-color": "#ECEFF1", "--lcv-background-color": "#FF4081" },
+    "ゆっくり魔理沙": { key: "ゆっくり魔理沙", defaultchara: "!marisa01", icon: "../../custom/FirstCounter/icon_marisa.png", "--lcv-name-color": "#FFE082", "--lcv-text-color": "#333333", "--lcv-background-color": "#FF8F00" },
+    "Nightbot": { key: "Nightbot", defaultchara: "!reimu11", "--lcv-name-color": "#FFC107", "--lcv-text-color": "#FFFFFF", "--lcv-background-color": "#36506C" },
   },
-  {
-   ran: 1,
-   img: "green",
-   color: "green",
-   text: "black",
-   back: "light-green",
-   gradation: "green",
+  COMMON_SWITCH: {
+    timer: 5,
+    gift: true,
+    greeting_syoken: true,
+    greeting_again: 7,
+    greeting_hi: true,
+    greeting_sagi: true,
+    engagement: true,
   },
-  { ran: 1, img: "aqua", text: "black", back: "cyan", gradation: "aqua" },
-  { ran: 1, img: "blue", text: "white", back: "blue", gradation: "blue" },
-  {
-   ran: 1,
-   img: "purple",
-   text: "white",
-   back: "purple",
-   gradation: "purple",
+  COMMON: {
+    timer: [
+      { ran: 5, chara: "ゆっくり霊夢", message: "チャンネル登録・高評価押してくれると、主が喜ぶわ。ゆっくりしていってね。", img: "!reimu11", },
+      { ran: 4, chara: "ゆっくり霊夢", message: "主はTwitterで積極的に活動中!フォローして頂けると主の感激の涙で川ができるそうよ。", img: "!reimu01", },
+      { ran: 3, chara: "ゆっくり魔理沙", message: "discordで活動中!主は配信中はいつも入っているぜ。友達になって欲しいんだぜ", img: "!marisa01", },
+    ],
+
+    gift: [
+      { ran: 4, price: 1, chara: "ゆっくり霊夢", message: "<<user>>さん、<<price>>ポイントのギフトありがとう!これからも配信続けていくわ。応援してね!", img: [{ "!saisen_haikei": -500 }, { "!saisen_hako": -200 }, { "!reimu11": 0 },], },
+      { ran: 1, price: 1, chara: "ゆっくり魔理沙", message: "やったぜ!<<user>>さんから<<price>>ポイントのギフトを頂いたぜ。これを元手に配信に精を出すぜ。ありがとだぜ!", img: [{ "!saisen_haikei": -500 }, { "!kinoko": -200 }, { "!marisa11": 0 },], },
+      { ran: 1, price: 500, priceLimit: 999, chara: "ゆっくり霊夢", message: "<<user>>さん、<<price>>ポイントのギフトありがとう!これからも配信続けていくわ。応援してね!", img: [{ "!saisen_haikei": -500 }, { "!saisen_hako": -200 }, { "!reimu11": 0 },], },
+      { ran: 1, price: 1000, priceLimit: 1999, chara: "ゆっくり霊夢", message: "<<user>>さん、<<price>>ポイントのギフトありがとう!これからも配信続けていくわ。応援してね!", img: [{ "!saisen_haikei": -500 }, { "!saisen_hako": -200 }, { "!reimu11": 0 },], },
+      { ran: 1, price: 2000, priceLimit: 4999, chara: "ゆっくり霊夢", message: "<<user>>さん、<<price>>ポイントのギフトありがとう!これからも配信続けていくわ。応援してね!", img: [{ "!saisen_haikei": -500 }, { "!saisen_hako": -200 }, { "!reimu11": 0 },], },
+      { ran: 1, price: 5000, priceLimit: 9999, chara: "ゆっくり霊夢", message: "<<user>>さん、<<price>>ポイントのギフトありがとう!これからも配信続けていくわ。応援してね!", img: [{ "!saisen_haikei": -500 }, { "!saisen_hako": -200 }, { "!reimu11": 0 },], },
+      { ran: 1, price: 10000, chara: "ゆっくり霊夢", message: "<<user>>さん、<<price>>ポイントのギフトありがとう!これからも配信続けていくわ。応援してね!", img: [{ "!saisen_haikei": -500 }, { "!saisen_hako": -200 }, { "!reimu11": 0 },], },
+    ],
+    // 初見
+    greeting_syoken: [
+      { ran: 5, chara: "ゆっくり霊夢", message: [{ ["<<user>>さん、初めまして!ゆっくりしていってね。"]: 1500 },], img: [{ "!初見": 0 }, { "!reimu11": 1500 },], },
+      { ran: 4, chara: "ゆっくり霊夢", message: [{ ["<<user>>さん、初見ありがとう!"]: 1500, },], img: [{ "!初見": 0 }, { "!reimu11": 1500 },], },
+      { ran: 3, chara: "ゆっくり魔理沙", message: [{ ["おっ、<<user>>さんが初めてのコメントだぜ!"]: 1500, },], img: [{ "!初見": 0 }, { "!marisa02": 1500 },], },
+    ],
+    // 久しぶり
+    greeting_again: [
+      { ran: 5, chara: "ゆっくり霊夢", message: "<<user>>さん、久しぶり!また会えたね。", img: "!reimu11", },
+      { ran: 4, chara: "ゆっくり霊夢", message: "<<user>>さんが久々に来たよ", img: "!reimu02", },
+      { ran: 3, chara: "ゆっくり魔理沙", message: "おっ、<<user>>さんだぜ。久しぶり!", img: "!marisa11", },
+    ],
+    // いつもの挨拶
+    greeting_hi: [
+      { ran: 5, chara: "ゆっくり霊夢", message: "<<user>>さん、こんにちは!ゆっくりしていってね。", img: "!reimu11", },
+      { ran: 4, chara: "ゆっくり霊夢", message: "<<user>>さん、また来てくれたね。ようこそ。", img: "!reimu11", },
+      { ran: 3, chara: "ゆっくり魔理沙", message: "おっ、<<user>>さんだ。これで<<tc>>回目のコメントだぜ", img: "!marisa11", },
+    ],
+    // 初見詐欺(OFFにする場合は、↑のsyoken_sagi_switch を0にする)
+    greeting_sagi: [
+      { ran: 5, chara: "ゆっくり霊夢", message: [{ ["<<user>>さん、あなた初見じゃないでしょ。"]: 1500 },], img: [{ "!初見": 0 }, { "!reimu21": 1500 },], },
+      { ran: 4, chara: "ゆっくり霊夢", message: [{ ["<<user>>さん、初めまし…あなた初見ではないわね?"]: 1500 },], img: [{ "!初見": 0 }, { "!reimu22": 1500 },], },
+      { ran: 3, chara: "ゆっくり魔理沙", message: [{ ["おい!<<user>>さん!初見ちゃうやろ!"]: 1500 },], img: [{ "!初見": 0 }, { "!marisa22": 1500 },], },
+    ],
+
+    // 参加　engagement
+    engagement: [
+      { ran: 5, chara: "ゆっくり霊夢", message: "<<user>>さんが参加してくれるそうよ。よろしくね。", img: [{ "!挑戦者": -1000 }, { "!reimu11": 0 },], },
+      { ran: 4, chara: "ゆっくり霊夢", message: "<<user>>さん、参加ありがとう！", img: [{ "!挑戦者": -1000 }, { "!reimu12": 0 },], },
+      { ran: 3, chara: "ゆっくり魔理沙", message: "おっ、<<user>>さんやるのか！よろしく頼むぜ！", img: [{ "!挑戦者": -1000 }, { "!marisa11": 0 },], },
+    ],
   },
-  { ran: 1, img: "pink", text: "white", back: "pink", gradation: "pink" },
- ],
- ROLE_IMAGES: {
-  everyone: {
-   userlevel: 0,
-   switch: false,
-   name: "だれでも",
-   img: "purple",
-   text: "none",
-   back: "none",
-   gradation: "none",
+  OMIKUJI_SWITCH: {
+    omikuji: new RegExp("^(おみくじ|omikuji|御神籤)"),
+    janken: new RegExp("^(じゃんけん|ジャンケン|janken)"),
+    test: new RegExp("^(てすと|テスト|test)"),
   },
-  member: {
-   userlevel: 1,
-   switch: false,
-   name: "メンバー",
-   img: "green",
-   text: "white",
-   back: "green",
-   gradation: "member",
+  OMIKUJI: {
+    // おみくじ
+    omikuji: [
+      { ran: 7, chara: "ゆっくり霊夢", message: "<<user>>さんの運勢は【大吉】努力が実を結び、幸運が訪れるって。積極的に行動すると良いことがあるわ。", img: [{ "!omikuji_huru": -1500 }, { "!omikuji_01": -500 }, { "!reimu02": 0 },], },
+      { ran: 6, chara: "ゆっくり霊夢", message: "<<user>>さんの運勢は【大吉】人との縁が幸運を呼び込みそう。感謝の気持ちを忘れないことが大事よ。", img: [{ "!omikuji_huru": -1500 }, { "!omikuji_01": -500 }, { "!reimu12": 0 },], },
+      { ran: 5, chara: "ゆっくり霊夢", message: "<<user>>さんの運勢は【大吉】健康運が特に好調ね。心身ともに充実した日々になるわ。", img: [{ "!omikuji_huru": -1500 }, { "!omikuji_01": -500 }, { "!reimu11": 0 },], },
+      { ran: 9, chara: "ゆっくり霊夢", message: "<<user>>さんの運勢は【吉】積極的に行動すると運気は上がるわ。新しい挑戦はチャンスよ。", img: [{ "!omikuji_huru": -1500 }, { "!omikuji_02": -500 }, { "!reimu12": 0 },], },
+      { ran: 8, chara: "ゆっくり霊夢", message: "<<user>>さんの運勢は【吉】周囲の人々に感謝の気持ちを忘れずにね。", img: [{ "!omikuji_huru": -1500 }, { "!omikuji_02": -500 }, { "!reimu11": 0 },], },
+      { ran: 7, chara: "ゆっくり霊夢", message: "<<user>>さんの運勢は【吉】今後の展望は明るめね。夢に向かって突き進めばいいことがあるわ。", img: [{ "!omikuji_huru": -1500 }, { "!omikuji_02": -500 }, { "!reimu02": 0 },], },
+      { ran: 8, chara: "ゆっくり霊夢", message: "<<user>>さんの運勢は【中吉】思いがけない幸運があるかも。チャンスを逃さないようにね。", img: [{ "!omikuji_huru": -1500 }, { "!omikuji_03": -500 }, { "!reimu11": 0 },], },
+      { ran: 7, chara: "ゆっくり霊夢", message: "<<user>>さんの運勢は【中吉】周囲の人との協力が大切よ。助けを求めることを恐れないで。", img: [{ "!omikuji_huru": -1500 }, { "!omikuji_03": -500 }, { "!reimu01": 0 },], },
+      { ran: 6, chara: "ゆっくり霊夢", message: "<<user>>さんの運勢は【中吉】自分の直感を信じていいわ。大きな成長が待ってるそうよ。", img: [{ "!omikuji_huru": -1500 }, { "!omikuji_03": -500 }, { "!reimu02": 0 },], },
+      { ran: 6, chara: "ゆっくり霊夢", message: "<<user>>さんの運勢は【小吉】いまは焦らず、一歩ずつ進むことね。努力すれば、願いは叶うと出ているわ。", img: [{ "!omikuji_huru": -1500 }, { "!omikuji_04": -500 }, { "!reimu11": 0 },], },
+      { ran: 5, chara: "ゆっくり霊夢", message: "<<user>>さんの運勢は【小吉】いまは慎重に行動が必要な時。きっと吉へと導かれるわ。慌てない事が大切よ。", img: [{ "!omikuji_huru": -1500 }, { "!omikuji_04": -500 }, { "!reimu01": 0 },], },
+      { ran: 4, chara: "ゆっくり霊夢", message: "<<user>>さんの運勢は【小吉】健康面に注意して。規則正しい生活が運気を呼び込むわ。", img: [{ "!omikuji_huru": -1500 }, { "!omikuji_04": -500 }, { "!reimu02": 0 },], },
+      { ran: 5, chara: "ゆっくり霊夢", message: "<<user>>さんの運勢は【末吉】油断が思わぬ結果に繋がるわ。慎重に行動して。", img: [{ "!omikuji_huru": -1500 }, { "!omikuji_05": -500 }, { "!reimu22": 0 },], },
+      { ran: 4, chara: "ゆっくり霊夢", message: "<<user>>さんの運勢は【末吉】今は試練の時期ね。乗り越えれば、大きな成長が待ってるわ。", img: [{ "!omikuji_huru": -1500 }, { "!omikuji_05": -500 }, { "!reimu01": 0 },], },
+      { ran: 3, chara: "ゆっくり霊夢", message: "<<user>>さんの運勢は【末吉】新しいことより、今の事を見直すといい事があるわ。", img: [{ "!omikuji_huru": -1500 }, { "!omikuji_05": -500 }, { "!reimu12": 0 },], },
+      { ran: 4, chara: "ゆっくり霊夢", message: "<<user>>さんの運勢は【凶】運気はやや下がり気味。慎重に行動するといいわ。", img: [{ "!omikuji_huru": -1500 }, { "!omikuji_06": -500 }, { "!reimu22": 0 },], },
+      { ran: 3, chara: "ゆっくり霊夢", message: "<<user>>さんの運勢は【凶】周囲の人とのトラブルに注意して。喧嘩になったら、頭を冷やすことね。", img: [{ "!omikuji_huru": -1500 }, { "!omikuji_06": -500 }, { "!reimu23": 0 },], },
+      { ran: 2, chara: "ゆっくり霊夢", message: "<<user>>さんの運勢は【凶】健康面に注意が必要ね。体調管理をしっかり。乳酸菌とってるぅ？", img: [{ "!omikuji_huru": -1500 }, { "!omikuji_06": -500 }, { "!reimu12": 0 },], },
+      { ran: 2, chara: "ゆっくり魔理沙", message: "<<user>>さんの運勢は【残念賞】笑いすぎに注意だぜ。腹筋が崩壊するかもしれないぜ。", img: [{ "!omikuji_huru": -1500 }, { "!omikuji_07": -500 }, { "!marisa11": 0 },], },
+      { ran: 2, chara: "ゆっくり魔理沙", message: "<<user>>さんの運勢は【残念賞】終わったわ、風が強すぎるぜ。強すぎてお亡くなりだぜ。", img: [{ "!omikuji_huru": -1500 }, { "!omikuji_07": -500 }, { "!marisa21": 0 },], },
+      { ran: 2, chara: "ゆっくり魔理沙", message: "<<user>>さんの運勢は【残念賞】陰謀論に注意だぜ。ネットde真実なんてないぜ。幅広い情報収集が大切だぜ。", img: [{ "!omikuji_huru": -1500 }, { "!omikuji_07": -500 }, { "!marisa22": 0 },], },
+      { ran: 1, chara: "ゆっくり魔理沙", message: "<<user>>さんの運勢は【残念賞】女子高生とか好きだからって理由で先生になっちゃいけないぜ。奥さんは美人だぜ。", img: [{ "!omikuji_huru": -1500 }, { "!omikuji_07": -500 }, { "!marisa21": 0 },], },
+    ],
+    // じゃんけん
+    janken: [
+      { ran: 18, chara: "ゆっくり霊夢", message: [{ ["じゃんけんぽん!"]: 0 }, { ["俺の勝ち!負けは次につながるチャンスです!ネバーギブアップ!"]: 4500 },], img: [{ "!janken_1": 500 }, { "!reimu02": 0 }, { "!janken_lose": 2000 }, { "!reimu12": 4500 },], },
+      { ran: 17, chara: "ゆっくり霊夢", message: [{ ["じゃんけんぽん!"]: 0 }, { ["俺の勝ち!じゃんけんの向こう側に何があるか、考えてみてください。"]: 4500 },], img: [{ "!janken_1": 500 }, { "!reimu02": 0 }, { "!janken_lose": 2000 }, { "!reimu12": 4500 },], },
+      { ran: 2, chara: "ゆっくり魔理沙", message: [{ ["じゃんけんぽん!"]: 0 }, { ["俺の勝ち!マリサ キリサメの心なんて読めるわけがない、そう思ってないですか。あきらめへん人だけに見える景色があるはずです。"]: 4500 },], img: [{ "!janken_1": 500 }, { "!marisa02": 0 }, { "!janken_lose": 2000 }, { "!marisa12": 4500 },], },
+      { ran: 18, chara: "ゆっくり霊夢", message: [{ ["じゃんけんぽん!"]: 0 }, { ["俺の勝ち!いい勝負でしたね!でも結果が伴わないと、全く意味がありません。"]: 4500 },], img: [{ "!janken_1": 500 }, { "!reimu02": 0 }, { "!janken_lose": 2000 }, { "!reimu12": 4500 },], },
+      { ran: 2, chara: "ゆっくり魔理沙", message: [{ ["じゃんけんぽん!"]: 0 }, { ["俺の勝ち!ちゃんと分析してます?じっくり結果に向き合ってください。"]: 4500 },], img: [{ "!janken_1": 500 }, { "!marisa02": 0 }, { "!janken_lose": 2000 }, { "!marisa12": 4500 },], },
+      { ran: 17, chara: "ゆっくり霊夢", message: [{ ["じゃんけんぽん!"]: 0 }, { ["俺の勝ち!何事も準備がすべて。それを怠っている事がバレてますよ。"]: 4500 },], img: [{ "!janken_1": 500 }, { "!reimu02": 0 }, { "!janken_lose": 2000 }, { "!reimu12": 4500 },], },
+      { ran: 2, chara: "ゆっくり魔理沙", message: [{ ["じゃんけんぽん!"]: 0 }, { ["俺の勝ち!ここは練習ではありません。全身全霊で俺と向き合ってください。"]: 4500 },], img: [{ "!janken_1": 500 }, { "!marisa02": 0 }, { "!janken_lose": 2000 }, { "!marisa12": 4500 },], },
+
+      { ran: 18, chara: "ゆっくり霊夢", message: [{ ["じゃんけんぽん!"]: 0 }, { ["俺の勝ち!たかがじゃんけん、そう思ってないですか？それやったら明日も、俺が勝ちますよ。"]: 4500 },], img: [{ "!janken_2": 500 }, { "!reimu02": 0 }, { "!janken_lose": 2000 }, { "!reimu12": 4500 },], },
+      { ran: 17, chara: "ゆっくり霊夢", message: [{ ["じゃんけんぽん!"]: 0 }, { ["俺の勝ち!ウラのウラのウラまで読む訓練をしてくださいね。どこまで読もうとするかで結果が変わってきます。"]: 4500 },], img: [{ "!janken_2": 500 }, { "!reimu02": 0 }, { "!janken_lose": 2000 }, { "!reimu12": 4500 },], },
+      { ran: 2, chara: "ゆっくり魔理沙", message: [{ ["じゃんけんぽん!"]: 0 }, { ["俺の勝ち!自信を持って勝負にしっかりと向き合える、そう思えるまで、準備してください。"]: 4500 },], img: [{ "!janken_2": 500 }, { "!marisa02": 0 }, { "!janken_lose": 2000 }, { "!marisa12": 4500 },], },
+      { ran: 18, chara: "ゆっくり霊夢", message: [{ ["じゃんけんぽん!"]: 0 }, { ["俺の勝ち!運を味方につけるのは、地道な努力ですよ。"]: 4500 },], img: [{ "!janken_2": 500 }, { "!reimu02": 0 }, { "!janken_lose": 2000 }, { "!reimu12": 4500 },], },
+      { ran: 2, chara: "ゆっくり魔理沙", message: [{ ["じゃんけんぽん!"]: 0 }, { ["俺の勝ち!ただの運やと思ってませんか?運も実力のうち!聞いたことありますよね?"]: 4500 },], img: [{ "!janken_2": 500 }, { "!marisa02": 0 }, { "!janken_lose": 2000 }, { "!marisa12": 4500 },], },
+      { ran: 17, chara: "ゆっくり霊夢", message: [{ ["じゃんけんぽん!"]: 0 }, { ["俺の勝ち!あなたの考えてる事ぐらい、俺にはお見通しです。"]: 4500 },], img: [{ "!janken_2": 500 }, { "!reimu02": 0 }, { "!janken_lose": 2000 }, { "!reimu12": 4500 },], },
+      { ran: 2, chara: "ゆっくり魔理沙", message: [{ ["じゃんけんぽん!"]: 0 }, { ["俺の勝ち!その程度の、気持ちで勝てるとでも思ったんですか?ちゃんと練習してきてください。"]: 4500 },], img: [{ "!janken_2": 500 }, { "!marisa02": 0 }, { "!janken_lose": 2000 }, { "!marisa12": 4500 },], },
+
+      { ran: 18, chara: "ゆっくり霊夢", message: [{ ["じゃんけんぽん!"]: 0 }, { ["俺の勝ち!なんで負けたか、明日まで考えといてください。そしたら何かが見えてくるはずです。"]: 4500 },], img: [{ "!janken_3": 500 }, { "!reimu02": 0 }, { "!janken_lose": 2000 }, { "!reimu12": 4500 },], },
+      { ran: 17, chara: "ゆっくり霊夢", message: [{ ["じゃんけんぽん!"]: 0 }, { ["俺の勝ち!どんな事でも絶対に勝つんや!というメンタリティーが大事ですよ。"]: 4500 },], img: [{ "!janken_3": 500 }, { "!reimu02": 0 }, { "!janken_lose": 2000 }, { "!reimu12": 4500 },], },
+      { ran: 2, chara: "ゆっくり魔理沙", message: [{ ["じゃんけんぽん!"]: 0 }, { ["俺の勝ち!複雑に考えてないですか?答えはシンプルです。マリサ キリサメの心を読む、それだけです。"]: 4500 },], img: [{ "!janken_3": 500 }, { "!marisa02": 0 }, { "!janken_lose": 2000 }, { "!marisa12": 4500 },], },
+      { ran: 18, chara: "ゆっくり霊夢", message: [{ ["じゃんけんぽん!"]: 0 }, { ["俺の勝ち!動揺してませんか?運が大事な時こそ集中力が物を言いますよ!"]: 4500 },], img: [{ "!janken_3": 500 }, { "!reimu02": 0 }, { "!janken_lose": 2000 }, { "!reimu12": 4500 },], },
+      { ran: 2, chara: "ゆっくり魔理沙", message: [{ ["じゃんけんぽん!"]: 0 }, { ["俺の勝ち!正確にはじゃんけんを味方につけた俺の勝ち!"]: 4500 },], img: [{ "!janken_3": 500 }, { "!marisa02": 0 }, { "!janken_lose": 2000 }, { "!marisa12": 4500 },], },
+      { ran: 17, chara: "ゆっくり霊夢", message: [{ ["じゃんけんぽん!"]: 0 }, { ["俺の勝ち!それで勝てると思ってるんやったら、俺がずっと勝ちますよ!"]: 4500 },], img: [{ "!janken_3": 500 }, { "!reimu02": 0 }, { "!janken_lose": 2000 }, { "!reimu12": 4500 },], },
+      { ran: 2, chara: "ゆっくり魔理沙", message: [{ ["じゃんけんぽん!"]: 0 }, { ["俺の勝ち!1年間何やってたんですか？この結果はじゃんけんに対する意識の差です。"]: 4500 },], img: [{ "!janken_3": 500 }, { "!marisa02": 0 }, { "!janken_lose": 2000 }, { "!marisa12": 4500 },], },
+
+      { ran: 2, chara: "ゆっくり霊夢", message: [{ ["じゃんけんぽん!"]: 0 }, { ["俺の負け!やるやん。明日は俺にリベンジさせて。"]: 4500 },], img: [{ "!janken_4": 500 }, { "!reimu02": 0 }, { "!janken_win": 2000 }, { "!reimu11": 4500 },], },
+      { ran: 2, chara: "ゆっくり霊夢", message: [{ ["じゃんけんぽん!"]: 0 }, { ["俺の負け!やるやん!でも、今度は絶対、俺が勝つから!また明日やろう!"]: 4500 },], img: [{ "!janken_4": 500 }, { "!reimu02": 0 }, { "!janken_win": 2000 }, { "!reimu11": 4500 },], },
+      { ran: 2, chara: "ゆっくり霊夢", message: [{ ["じゃんけんぽん!"]: 0 }, { ["俺の負け!明日、俺が勝つからまたやろう!"]: 4500 },], img: [{ "!janken_4": 500 }, { "!reimu02": 0 }, { "!janken_win": 2000 }, { "!reimu11": 4500 },], },
+      { ran: 2, chara: "ゆっくり霊夢", message: [{ ["じゃんけんぽん!"]: 0 }, { ["俺の負け!やるやん。今日は負けを認めます。ただ、勝ち逃げは許しませんよ。"]: 4500 },], img: [{ "!janken_4": 500 }, { "!reimu02": 0 }, { "!janken_win": 2000 }, { "!reimu11": 4500 },], },
+      { ran: 1, chara: "ゆっくり魔理沙", message: [{ ["じゃんけんぽん!"]: 0 }, { ["俺の負け!やるやん。明日は俺にリベンジさせて。"]: 4500 },], img: [{ "!janken_4": 500 }, { "!marisa02": 0 }, { "!janken_win": 2000 }, { "!marisa11": 4500 },], },
+      { ran: 1, chara: "ゆっくり魔理沙", message: [{ ["じゃんけんぽん!"]: 0 }, { ["俺の負け!やるやん!でも、今度は絶対、俺が勝つから!また明日やろう!"]: 4500 },], img: [{ "!janken_4": 500 }, { "!marisa02": 0 }, { "!janken_win": 2000 }, { "!marisa11": 4500 },], },
+      { ran: 1, chara: "ゆっくり魔理沙", message: [{ ["じゃんけんぽん!"]: 0 }, { ["俺の負け!明日、俺が勝つからまたやろう!"]: 4500 },], img: [{ "!janken_4": 500 }, { "!marisa02": 0 }, { "!janken_win": 2000 }, { "!marisa11": 4500 },], },
+      { ran: 1, chara: "ゆっくり魔理沙", message: [{ ["じゃんけんぽん!"]: 0 }, { ["俺の負け!やるやん。今日は負けを認めます。ただ、勝ち逃げは許しませんよ。"]: 4500 },], img: [{ "!janken_4": 500 }, { "!marisa02": 0 }, { "!janken_win": 2000 }, { "!marisa11": 4500 },], },
+    ],
+
+    // test
+    test: [
+      { ran: 2, chara: "ゆっくり霊夢", funcID: "hoge", message: "<<user>>さんの資金は<<AAA>>ですぞ", },
+    ],
+
   },
-  moderator: {
-   userlevel: 2,
-   switch: false,
-   name: "モデレーター",
-   img: "blue",
-   text: "white",
-   back: "indigo",
-   gradation: "moderator",
+  FUNKS: {
+    hoge: `
+  const X = [{ hoge: 100 }, { hoge: 200 }, { hoge: 300 }];
+  return X[Math.floor(Math.random() * X.length)].hoge;
+ `,
+    huga: `
+  let X = 0;
+  for(;;){X+=1;}
+  return X[Math.floor(Math.random() * X.length)].hoge;
+ `,
   },
-  owner: {
-   userlevel: 3,
-   switch: true,
-   name: "配信者",
-   img: "red",
-   text: "white",
-   back: "purple",
-   gradation: "owner",
-  },
- },
- USER_IMAGES: [
-  {
-   username: ["ユーザー1", "ユーザー3"],
-   img: "pink",
-   text: "white",
-   back: "black",
-   gradation: "user1",
-  },
-  {
-   username: ["ユーザー2"],
-   img: "white",
-   text: "white",
-   back: "light-green",
-   gradation: "user2",
-  },
-  {
-   username: ["ユーザー4"],
-   img: "orange",
-   text: "none",
-   back: "teal",
-   gradation: "user3",
-  },
-  {
-   username: ["ユーザー5"],
-   img: "yellow",
-   text: "black",
-   back: "grey",
-   gradation: "user4",
-  },
-  {
-   username: ["ユーザー6", "ユーザー7"],
-   img: "black",
-   text: "white",
-   back: "pink",
-   gradation: "user5",
-  },
-  {
-   username: ["ユーザー8", "ユーザー9", "ユーザー10"],
-   img: "aqua",
-   text: "black",
-   back: "lime",
-   gradation: "user6",
-  },
-  {
-   username: ["アナウンス"],
-   img: "user1",
-   text: "none",
-   back: "none",
-   gradation: "none",
-  },
- ],
- TEXTCOLOR: {
-  none: { key: "none", name: "(標準)", color: "" },
-  black: { key: "black", name: "くろ", color: "#000000" },
-  white: { key: "white", name: "しろ", color: "#FFFFFF" },
-  greydarken4: { key: "greydarken4", name: "濃いグレー", color: "#212121" },
-  greylighten3: { key: "greylighten3", name: "薄いグレー", color: "#EEEEEE" },
- },
- BACKCOLOR: {
-  none: { key: "none", name: "(標準)", color: "" },
-  red: { name: "あか", color: "#F44336", key: "red" },
-  pink: { name: "ぴんく", color: "#E91E63", key: "pink" },
-  purple: { name: "むらさき", color: "#9C27B0", key: "purple" },
-  "deep-purple": {
-   name: "あおむらさき",
-   color: "#673AB7",
-   key: "deep-purple",
-  },
-  indigo: { name: "あいいろ", color: "#3F51B5", key: "indigo" },
-  blue: { name: "あお", color: "#2196F3", key: "blue" },
-  "light-blue": { name: "みずいろ", color: "#03A9F4", key: "light-blue" },
-  cyan: { name: "しあん", color: "#00BCD4", key: "cyan" },
-  teal: { name: "あおみどり", color: "#009688", key: "teal" },
-  green: { name: "みどり", color: "#4CAF50", key: "green" },
-  "light-green": { name: "きみどり", color: "#8BC34A", key: "light-green" },
-  lime: { name: "らいむ", color: "#CDDC39", key: "lime" },
-  yellow: { name: "きいろ", color: "#FFEB3B", key: "yellow" },
-  amber: { name: "やまぶき", color: "#FFC107", key: "amber" },
-  orange: { name: "おれんじ", color: "#FF9800", key: "orange" },
-  "deep-orange": { name: "かき", color: "#FF5722", key: "deep-orange" },
-  brown: { name: "ちゃいろ", color: "#795548", key: "brown" },
-  "blue-grey": { name: "ぐれい", color: "#607D8B", key: "blue-grey" },
-  grey: { name: "はいいろ", color: "#9E9E9E", key: "grey" },
-  black: { name: "くろ", color: "#212121", key: "black" },
-  white: { name: "しろ", color: "#FFFFFF", key: "white" },
- },
- GRADATION: {
-  none: { name: "(なし)", color: "", key: "none" },
-  white: {
-   key: "white",
-   name: "しろ",
-   color:
-    "linear-gradient(to bottom, rgba(242,246,248,1) 0%,rgba(216,225,231,1) 50%,rgba(181,198,208,1) 51%,rgba(224,239,249,1) 100%)",
-  },
-  black: {
-   key: "black",
-   name: "くろ",
-   color:
-    "linear-gradient(to bottom, rgba(76,76,76,1) 0%,rgba(89,89,89,1) 12%,rgba(102,102,102,1) 25%,rgba(71,71,71,1) 39%,rgba(44,44,44,1) 50%,rgba(0,0,0,1) 51%,rgba(17,17,17,1) 60%,rgba(43,43,43,1) 76%,rgba(28,28,28,1) 91%,rgba(19,19,19,1) 100%)",
-  },
-  red: {
-   key: "red",
-   name: "あか",
-   color:
-    "linear-gradient(to bottom, rgba(248,80,50,1) 0%,rgba(241,111,92,1) 50%,rgba(246,41,12,1) 51%,rgba(240,47,23,1) 71%,rgba(231,56,39,1) 100%)",
-  },
-  orange: {
-   key: "orange",
-   name: "おれんじ",
-   color:
-    "linear-gradient(to bottom, rgba(243,197,189,1) 0%,rgba(232,108,87,1) 50%,rgba(234,40,3,1) 51%,rgba(255,102,0,1) 75%,rgba(199,34,0,1) 100%)",
-  },
-  yellow: {
-   key: "yellow",
-   name: "きいろ",
-   color:
-    "linear-gradient(to bottom, rgba(252,234,187,1) 0%,rgba(252,205,77,1) 50%,rgba(248,181,0,1) 51%,rgba(251,223,147,1) 100%)",
-  },
-  green: {
-   key: "green",
-   name: "みどり",
-   color:
-    "linear-gradient(to bottom, rgba(157,213,58,1) 0%,rgba(161,213,79,1) 50%,rgba(128,194,23,1) 51%,rgba(124,188,10,1) 100%)",
-  },
-  aqua: {
-   key: "aqua",
-   name: "みずいろ",
-   color:
-    "linear-gradient(to bottom, rgba(183,222,237,1) 0%,rgba(113,206,239,1) 50%,rgba(33,180,226,1) 51%,rgba(183,222,237,1) 100%)",
-  },
-  blue: {
-   key: "blue",
-   name: "あお",
-   color:
-    "linear-gradient(to bottom, #1e5799 0%,#2989d8 50%,#207cca 51%,#7db9e8 100%)",
-  },
-  purple: {
-   key: "purple",
-   name: "むらさき",
-   color:
-    "linear-gradient(to bottom, rgba(203,96,179,1) 0%,rgba(193,70,161,1) 50%,rgba(168,0,119,1) 51%,rgba(219,54,164,1) 100%)",
-  },
-  pink: {
-   key: "pink",
-   name: "ぴんく",
-   color:
-    "linear-gradient(to bottom, rgba(239,197,202,1) 0%,rgba(210,75,90,1) 50%,rgba(186,39,55,1) 51%,rgba(241,142,153,1) 100%)",
-  },
-  member: {
-   key: "member",
-   name: "メンバー",
-   color:
-    "repeating-linear-gradient(45deg, rgba(193, 249, 252,0.12) 0px, rgba(193, 249, 252,0.12) 1px,transparent 1px, transparent 13px),repeating-linear-gradient(135deg, rgba(193, 249, 252,0.12) 0px, rgba(193, 249, 252,0.12) 1px,transparent 1px, transparent 13px),linear-gradient(90deg, rgb(215, 32, 135),rgb(223, 206, 104))",
-  },
-  moderator: {
-   key: "moderator",
-   name: "モデレーター",
-   color:
-    "repeating-linear-gradient(135deg, hsla(210,79%,75%,0.05) 0px, hsla(210,79%,75%,0.05) 1px,transparent 1px, transparent 11px,hsla(210,79%,75%,0.05) 11px, hsla(210,79%,75%,0.05) 12px,transparent 12px, transparent 32px),repeating-linear-gradient(45deg, hsla(210,79%,75%,0.05) 0px, hsla(210,79%,75%,0.05) 1px,transparent 1px, transparent 11px,hsla(210,79%,75%,0.05) 11px, hsla(210,79%,75%,0.05) 12px,transparent 12px, transparent 32px),repeating-linear-gradient(90deg, hsla(210,79%,75%,0.05) 0px, hsla(210,79%,75%,0.05) 1px,transparent 1px, transparent 11px,hsla(210,79%,75%,0.05) 11px, hsla(210,79%,75%,0.05) 12px,transparent 12px, transparent 32px),repeating-linear-gradient(0deg, hsla(210,79%,75%,0.05) 0px, hsla(210,79%,75%,0.05) 1px,transparent 1px, transparent 11px,hsla(210,79%,75%,0.05) 11px, hsla(210,79%,75%,0.05) 12px,transparent 12px, transparent 32px),linear-gradient(90deg, rgb(83, 220, 200),rgb(58, 78, 174))",
-  },
-  owner: {
-   key: "owner",
-   name: "配信者",
-   color:
-    "radial-gradient(circle at 52% 37%, hsla(165,0%,91%,0.05) 0%, hsla(165,0%,91%,0.05) 15%,transparent 15%, transparent 65%,transparent 65%, transparent 100%),radial-gradient(circle at 70% 3%, hsla(165,0%,91%,0.05) 0%, hsla(165,0%,91%,0.05) 33%,transparent 33%, transparent 62%,transparent 62%, transparent 100%),radial-gradient(circle at 38% 28%, hsla(165,0%,91%,0.05) 0%, hsla(165,0%,91%,0.05) 15%,transparent 15%, transparent 94%,transparent 94%, transparent 100%),radial-gradient(circle at 12% 92%, hsla(165,0%,91%,0.05) 0%, hsla(165,0%,91%,0.05) 1%,transparent 1%, transparent 19%,transparent 19%, transparent 100%),radial-gradient(circle at 50% 84%, hsla(165,0%,91%,0.05) 0%, hsla(165,0%,91%,0.05) 28%,transparent 28%, transparent 96%,transparent 96%, transparent 100%),radial-gradient(circle at 11% 43%, hsla(165,0%,91%,0.05) 0%, hsla(165,0%,91%,0.05) 20%,transparent 20%, transparent 63%,transparent 63%, transparent 100%),radial-gradient(circle at 45% 11%, hsla(165,0%,91%,0.05) 0%, hsla(165,0%,91%,0.05) 19%,transparent 19%, transparent 65%,transparent 65%, transparent 100%),radial-gradient(circle at 90% 54%, hsla(165,0%,91%,0.05) 0%, hsla(165,0%,91%,0.05) 11%,transparent 11%, transparent 19%,transparent 19%, transparent 100%),radial-gradient(circle at 23% 100%, hsla(165,0%,91%,0.05) 0%, hsla(165,0%,91%,0.05) 35%,transparent 35%, transparent 86%,transparent 86%, transparent 100%),linear-gradient(0deg, rgb(95, 19, 0),rgb(187, 23, 4)",
-  },
-  user1: {
-   key: "user1",
-   name: "ユーザー1",
-   color:
-    "repeating-linear-gradient(90deg, rgb(16, 16, 16) 0px, rgb(16, 16, 16) 35px,rgb(9, 9, 9) 35px, rgb(9, 9, 9) 70px,rgb(1, 1, 1) 70px, rgb(1, 1, 1) 105px,rgb(6, 6, 6) 105px, rgb(6, 6, 6) 140px,rgb(4, 4, 4) 140px, rgb(4, 4, 4) 175px,rgb(14, 14, 14) 175px, rgb(14, 14, 14) 210px,rgb(11, 11, 11) 210px, rgb(11, 11, 11) 245px,rgb(19, 19, 19) 245px, rgb(19, 19, 19) 280px)",
-  },
-  user2: {
-   key: "user2",
-   name: "ユーザー2",
-   color:
-    "linear-gradient(229deg, rgba(248, 248, 248, 0.04) 0%, rgba(248, 248, 248, 0.04) 54%,rgba(112, 112, 112, 0.04) 54%, rgba(112, 112, 112, 0.04) 100%),linear-gradient(239deg, rgba(252, 252, 252, 0.04) 0%, rgba(252, 252, 252, 0.04) 66%,rgba(111, 111, 111, 0.04) 66%, rgba(111, 111, 111, 0.04) 100%),linear-gradient(141deg, rgba(40, 40, 40, 0.04) 0%, rgba(40, 40, 40, 0.04) 44%,rgba(168, 168, 168, 0.04) 44%, rgba(168, 168, 168, 0.04) 100%),linear-gradient(287deg, rgba(40, 40, 40, 0.04) 0%, rgba(40, 40, 40, 0.04) 78%,rgba(141, 141, 141, 0.04) 78%, rgba(141, 141, 141, 0.04) 100%),linear-gradient(90deg, rgb(53, 166, 233),rgb(17, 240, 126))",
-  },
-  user3: {
-   key: "user3",
-   name: "ユーザー3",
-   color:
-    "radial-gradient(circle at bottom center, rgb(197, 234, 55) 0%, rgb(197, 234, 55) 12%,rgb(170, 222, 63) 12%, rgb(170, 222, 63) 18%,rgb(144, 210, 72) 18%, rgb(144, 210, 72) 23%,rgb(117, 198, 80) 23%, rgb(117, 198, 80) 47%,rgb(90, 187, 88) 47%, rgb(90, 187, 88) 59%,rgb(63, 175, 96) 59%, rgb(63, 175, 96) 68%,rgb(37, 163, 105) 68%, rgb(37, 163, 105) 86%,rgb(10, 151, 113) 86%, rgb(10, 151, 113) 100%)",
-  },
-  user4: {
-   key: "user4",
-   name: "ユーザー4",
-   color:
-    "repeating-linear-gradient(148deg, rgba(0,0,0,0.03) 0px, rgba(0,0,0,0.03) 12px,transparent 12px, transparent 13px,rgba(0,0,0,0.03) 13px, rgba(0,0,0,0.03) 18px,transparent 18px, transparent 26px),repeating-linear-gradient(83deg, rgba(0,0,0,0.03) 0px, rgba(0,0,0,0.03) 6px,transparent 6px, transparent 14px,rgba(0,0,0,0.03) 14px, rgba(0,0,0,0.03) 26px,transparent 26px, transparent 38px),repeating-linear-gradient(325deg, rgba(0,0,0,0.03) 0px, rgba(0,0,0,0.03) 12px,transparent 12px, transparent 15px,rgba(0,0,0,0.03) 15px, rgba(0,0,0,0.03) 20px,transparent 20px, transparent 30px),repeating-linear-gradient(148deg, rgba(0,0,0,0.03) 0px, rgba(0,0,0,0.03) 5px,transparent 5px, transparent 7px,rgba(0,0,0,0.03) 7px, rgba(0,0,0,0.03) 12px,transparent 12px, transparent 23px),repeating-linear-gradient(330deg, rgba(0,0,0,0.03) 0px, rgba(0,0,0,0.03) 6px,transparent 6px, transparent 17px,rgba(0,0,0,0.03) 17px, rgba(0,0,0,0.03) 28px,transparent 28px, transparent 29px),repeating-linear-gradient(142deg, rgba(0,0,0,0.03) 0px, rgba(0,0,0,0.03) 6px,transparent 6px, transparent 7px,rgba(0,0,0,0.03) 7px, rgba(0,0,0,0.03) 12px,transparent 12px, transparent 21px),linear-gradient(90deg, hsl(124,0%,91%),hsl(124,0%,91%))",
-  },
-  user5: {
-   key: "user5",
-   name: "ユーザー5",
-   color:
-    "repeating-linear-gradient(45deg, rgba(0,0,0,0.3) 0px, rgba(0,0,0,0.3) 16px,transparent 16px, transparent 32px,rgba(0,0,0,0.08) 32px, rgba(0,0,0,0.08) 48px,rgba(0,0,0,0.14) 48px, rgba(0,0,0,0.14) 64px,rgba(0,0,0,0.05) 64px, rgba(0,0,0,0.05) 80px,transparent 80px, transparent 96px,rgba(0,0,0,0.21) 96px, rgba(0,0,0,0.21) 112px,rgba(0,0,0,0.18) 112px, rgba(0,0,0,0.18) 128px,rgba(0,0,0,0.21) 128px, rgba(0,0,0,0.21) 144px,rgba(0,0,0,0.29) 144px, rgba(0,0,0,0.29) 160px,rgba(0,0,0,0.08) 160px, rgba(0,0,0,0.08) 176px,rgba(0,0,0,0.3) 176px, rgba(0,0,0,0.3) 192px,rgba(0,0,0,0.23) 192px, rgba(0,0,0,0.23) 208px),repeating-linear-gradient(135deg, transparent 0px, transparent 3px,rgba(0,0,0,0.1) 3px, rgba(0,0,0,0.1) 6px,rgba(0,0,0,0.03) 6px, rgba(0,0,0,0.03) 9px,rgba(0,0,0,0.09) 9px, rgba(0,0,0,0.09) 12px,rgba(0,0,0,0.08) 12px, rgba(0,0,0,0.08) 15px,rgba(0,0,0,0.1) 15px, rgba(0,0,0,0.1) 18px,rgba(0,0,0,0.1) 18px, rgba(0,0,0,0.1) 21px,rgba(0,0,0,0.04) 21px, rgba(0,0,0,0.04) 24px,transparent 24px, transparent 27px,rgba(0,0,0,0.03) 27px, rgba(0,0,0,0.03) 30px,rgba(0,0,0,0.03) 30px, rgba(0,0,0,0.03) 33px,rgba(0,0,0,0.01) 33px, rgba(0,0,0,0.01) 36px,rgba(0,0,0,0.1) 36px, rgba(0,0,0,0.1) 39px,rgba(0,0,0,0.06) 39px, rgba(0,0,0,0.06) 42px,transparent 42px, transparent 45px,rgba(0,0,0,0.03) 45px, rgba(0,0,0,0.03) 48px,rgba(0,0,0,0.05) 48px, rgba(0,0,0,0.05) 51px,rgba(0,0,0,0.03) 51px, rgba(0,0,0,0.03) 54px),repeating-linear-gradient(90deg, rgba(0,0,0,0.18) 0px, rgba(0,0,0,0.18) 14px,transparent 14px, transparent 28px,rgba(0,0,0,0.3) 28px, rgba(0,0,0,0.3) 42px,rgba(0,0,0,0.25) 42px, rgba(0,0,0,0.25) 56px,rgba(0,0,0,0.07) 56px, rgba(0,0,0,0.07) 70px,rgba(0,0,0,0.23) 70px, rgba(0,0,0,0.23) 84px,rgba(0,0,0,0.02) 84px, rgba(0,0,0,0.02) 98px,rgba(0,0,0,0.04) 98px, rgba(0,0,0,0.04) 112px,rgba(0,0,0,0.07) 112px, rgba(0,0,0,0.07) 126px,rgba(0,0,0,0.21) 126px, rgba(0,0,0,0.21) 140px,rgba(0,0,0,0.15) 140px, rgba(0,0,0,0.15) 154px,transparent 154px, transparent 168px,rgba(0,0,0,0.12) 168px, rgba(0,0,0,0.12) 182px,rgba(0,0,0,0.13) 182px, rgba(0,0,0,0.13) 196px,rgba(0,0,0,0.27) 196px, rgba(0,0,0,0.27) 210px),repeating-linear-gradient(0deg, rgba(0,0,0,0.17) 0px, rgba(0,0,0,0.17) 14px,rgba(0,0,0,0.26) 14px, rgba(0,0,0,0.26) 28px,rgba(0,0,0,0.06) 28px, rgba(0,0,0,0.06) 42px,rgba(0,0,0,0.14) 42px, rgba(0,0,0,0.14) 56px,transparent 56px, transparent 70px,rgba(0,0,0,0.22) 70px, rgba(0,0,0,0.22) 84px,rgba(0,0,0,0.1) 84px, rgba(0,0,0,0.1) 98px,transparent 98px, transparent 112px,rgba(0,0,0,0.15) 112px, rgba(0,0,0,0.15) 126px,transparent 126px, transparent 140px,rgba(0,0,0,0.03) 140px, rgba(0,0,0,0.03) 154px,rgba(0,0,0,0.03) 154px, rgba(0,0,0,0.03) 168px,rgba(0,0,0,0.06) 168px, rgba(0,0,0,0.06) 182px,rgba(0,0,0,0.17) 182px, rgba(0,0,0,0.17) 196px,rgba(0,0,0,0.2) 196px, rgba(0,0,0,0.2) 210px),linear-gradient(135deg, rgb(252, 16, 76),rgb(244, 3, 176))",
-  },
-  user6: {
-   key: "user6",
-   name: "ユーザー6",
-   color:
-    "repeating-linear-gradient(135deg, rgba(0,0,0,0.04) 0px, rgba(0,0,0,0.04) 2px,transparent 2px, transparent 4px),linear-gradient(135deg, rgb(252, 247, 9),rgb(229, 130, 102))",
-  },
- },
- IMAGES: {
-  none: {
-   key: "none",
-   name: "(なし)",
-   color: "",
-   positionX: 100,
-   positionY: 100,
-   repeat: "no-repeat",
-   sizeX: 100,
-   sizeXauto: true,
-   sizeY: 100,
-   sizeYauto: false,
-  },
-  white: {
-   name: "しろ",
-   color: "girl03_spacesuit01.gif",
-   key: "white",
-   positionX: 100,
-   positionY: 70,
-   repeat: "no-repeat",
-   sizeX: 100,
-   sizeXauto: true,
-   sizeY: 100,
-   sizeYauto: true,
-  },
-  black: {
-   name: "くろ",
-   color: "boy06_ninja01.gif",
-   key: "black",
-   positionX: 100,
-   positionY: 70,
-   repeat: "no-repeat",
-   sizeX: 100,
-   sizeXauto: true,
-   sizeY: 100,
-   sizeYauto: true,
-  },
-  red: {
-   name: "あか",
-   color: "boy01_cap01.gif",
-   key: "red",
-   positionX: 100,
-   positionY: 70,
-   repeat: "no-repeat",
-   sizeX: 100,
-   sizeXauto: true,
-   sizeY: 100,
-   sizeYauto: true,
-  },
-  orange: {
-   name: "おれんじ",
-   color: "corn01_red01.gif",
-   key: "orange",
-   positionX: 100,
-   positionY: 0,
-   repeat: "no-repeat",
-   sizeX: 100,
-   sizeXauto: true,
-   sizeY: 100,
-   sizeYauto: true,
-  },
-  yellow: {
-   name: "きいろ",
-   color: "boy05_bee01.gif",
-   key: "yellow",
-   positionX: 100,
-   positionY: 70,
-   repeat: "no-repeat",
-   sizeX: 100,
-   sizeXauto: true,
-   sizeY: 100,
-   sizeYauto: true,
-  },
-  green: {
-   name: "みどり",
-   color: "girl07_longhair02.gif",
-   key: "green",
-   positionX: 100,
-   positionY: 70,
-   repeat: "no-repeat",
-   sizeX: 100,
-   sizeXauto: true,
-   sizeY: 100,
-   sizeYauto: true,
-  },
-  aqua: {
-   name: "みずいろ",
-   color: "mashroom02_red01.gif",
-   key: "aqua",
-   positionX: 100,
-   positionY: 90,
-   repeat: "no-repeat",
-   sizeX: 100,
-   sizeXauto: true,
-   sizeY: 100,
-   sizeYauto: true,
-  },
-  blue: {
-   name: "あお",
-   color: "girl02_longhair01.gif",
-   key: "blue",
-   positionX: 100,
-   positionY: 100,
-   repeat: "no-repeat",
-   sizeX: 100,
-   sizeXauto: true,
-   sizeY: 100,
-   sizeYauto: true,
-  },
-  purple: {
-   name: "むらさき",
-   color: "girl09_witch02.gif",
-   key: "purple",
-   positionX: 100,
-   positionY: 70,
-   repeat: "no-repeat",
-   sizeX: 100,
-   sizeXauto: true,
-   sizeY: 100,
-   sizeYauto: true,
-  },
-  pink: {
-   name: "ぴんく",
-   color: "boy09_cat02.gif",
-   key: "pink",
-   positionX: 100,
-   positionY: 70,
-   repeat: "no-repeat",
-   sizeX: 100,
-   sizeXauto: true,
-   sizeY: 100,
-   sizeYauto: true,
-  },
-  user1: {
-   name: "アナウンス",
-   color: "info.png",
-   key: "user1",
-   positionX: 100,
-   positionY: "40",
-   repeat: "no-repeat",
-   sizeX: 100,
-   sizeXauto: true,
-   sizeY: 100,
-   sizeYauto: true,
-  },
- },
-};
+}
+
+
+
+
+

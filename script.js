@@ -1,3 +1,20 @@
+////////////////////////////////////////////////////////////
+// 初見判定ちゃん First Counter for わんコメ v0.3 240403
+////////////////////////////////////////////////////////////
+
+// テストスイッチ
+// 0:OFF 1:こんにちは 2:久しぶり 3:初見
+const testSwitch = DATAOBJ.PREFERENCES.testSwitch;
+// 投稿する枠のID(配信枠が複数あり、投稿先を指定したい場合。
+// 枠名で右クリックをすると、IDをコピーが出ますので、それを貼り付けて下さい)
+// 枠が1つの場合、またはわからない場合は空白でOKです。
+let activeFrameId = DATAOBJ.PREFERENCES.activeFrameId;
+// コメントしてからBotが反応するまでの遅延(ミリ秒)、小さすぎるとBotが機能しない場合があります
+const basicdelay = DATAOBJ.PREFERENCES.basicdelay;
+// ギフト対応(0:OFF 1:ON)
+const gift_switch = DATAOBJ.COMMON_SWITCH.gift;
+
+
 const LIMIT = 30;
 const app = Vue.createApp({
   setup() {
@@ -18,7 +35,7 @@ const app = Vue.createApp({
   },
   async created() {
     // Xmin毎にコメント
-    const min = Math.max(posttime_min || 0.99, 0.99);
+    const min = Math.max(DATAOBJ.COMMON_SWITCH.timer || 0.99, 0.99);
     if (min >= 1) { await posttime(); }
     const timer = setInterval(async () => {
       if (min >= 1) { await posttime(); }
@@ -34,7 +51,7 @@ const app = Vue.createApp({
     const INTERVAL = OneSDK.getStyleVariable("--lcv-enter-duration", 160, parseInt) + WAIT_DURATION;
     const LIFE_TIME = OneSDK.getStyleVariable("--lcv-lifetime", 20000, parseInt) + WAIT_DURATION;
     // CHARACTER のキー名を取得
-    const CHARACTERkeys = Object.keys(CHARACTER);
+    const CHARACTERkeys = Object.keys(DATAOBJ.CHARACTER);
 
     commentIndex = 0;
     OneSDK.setup({
@@ -62,11 +79,11 @@ const app = Vue.createApp({
           // FirstCounterを表示/nightbot_switchが1ならNightbotも表示
           if (comment.length !== 0 && (comment.data.userId === "FirstCounter" | CHARACTERkeys.includes(comment.data.name))) {
             // コメントしたキャラに合わせて、commentにcssデータを注入
-            comment.css = CHARACTER[comment.data.name];
+            comment.css = DATAOBJ.CHARACTER[comment.data.name];
             queue.push(...comments);
             // 初見判定ちゃんでないなら、このタイミングでキャラクターを出す
             if (comment.data.userId !== "FirstCounter") {
-              post_WordParty([{ [CHARACTER[comment.data.name].defaultchara]: -5000 }])
+              post_WordParty([{ [DATAOBJ.CHARACTER[comment.data.name].defaultchara]: -5000 }])
             }
           }
         });
@@ -85,7 +102,7 @@ const app = Vue.createApp({
             // 新しく参加希望があるなら反応させる
             const obj = GetMessage({ user: List.username }, "waiting");
             if (obj) {
-              if (!obj.img) { obj.img = CHARACTER[obj.chara].defaultchara }
+              if (!obj.img) { obj.img = DATAOBJ.CHARACTER[obj.chara].defaultchara }
               post_WordParty(obj.img);
               post_onecome(obj.chara, obj.message);
             }
@@ -147,47 +164,36 @@ function GetMessage(data, mode, price = 0) {
   let AAA;
   if (obj.funcID) {
     const userCode = DATAOBJ.FUNKS?.[obj.funcID];
-
-     if (userCode) {
-      // Promiseを返す関数を定義
-      const runWorker = () => {
-        return new Promise((resolve, reject) => {
-          const purifiedCode = DOMPurify.sanitize(userCode, { SAFE_FOR_JQUERY: true });
-          const worker = new Worker(URL.createObjectURL(new Blob([`(function () { ${purifiedCode} })()`], { type: 'text/javascript' })));
-
-          // Worker の処理結果を待ち受ける
-          worker.onmessage = (event) => {
-            clearTimeout(timeoutTimer);
-            resolve(event.data);
-          };
-
-          // Worker でエラーが発生した場合の処理
-          worker.onerror = (error) => {
-            clearTimeout(timeoutTimer);
-            reject("コードの実行中にエラーが発生しました: " + error.message);
-          };
-
-          // タイムアウト用のタイマーを設定
-          const timeoutTimer = setTimeout(() => {
-            worker.terminate();
-            reject("処理がタイムアウトしました");
-          }, 1000);
-        });
-      };
-
-      // Workerの処理を非同期で実行
-      try {
-        AAA = runWorker();
-      } catch (error) {
-        console.error(error);
-      }
+    if (userCode) {
+      // userCodeをDOMPurifyを使用して安全に処理
+      const purifiedCode = DOMPurify.sanitize(userCode, { SAFE_FOR_JQUERY: true });
+      const func = new Function(purifiedCode);
+      AAA = func();
     }
   }
   // <<user>><<tc>><<AAA>>を書き換え
-  obj.message = obj.message
-    .replace(/<<user>>/g, data.user !== undefined ? data.user : "(error)")
-    .replace(/<<tc>>/g, data.tc !== undefined ? data.tc : "(error)")
-    .replace(/<<AAA>>/g, AAA !== undefined ? AAA : "(error)");
+  if (Array.isArray(obj.message)) {
+    // 配列の各要素に対して処理を行う
+    obj.message.forEach((item, index) => {
+      // オブジェクトのキー名を置換する
+      const replacedItem = {};
+      for (const key in item) {
+        let replacedKey = key.replace(/<<user>>/g, data.user !== undefined ? data.user : "(error)");
+        replacedKey = replacedKey.replace(/<<tc>>/g, data.tc !== undefined ? data.tc : "(error)");
+        replacedKey = replacedKey.replace(/<<AAA>>/g, AAA !== undefined ? AAA : "(error)");
+
+        replacedItem[replacedKey] = item[key];
+      }
+      // 置換されたオブジェクトを元の配列に置き換える
+      obj.message[index] = replacedItem;
+    });
+  } else {
+    // 配列でない場合の処理
+    obj.message = obj.message
+      .replace(/<<user>>/g, data.user !== undefined ? data.user : "(error)")
+      .replace(/<<tc>>/g, data.tc !== undefined ? data.tc : "(error)")
+      .replace(/<<AAA>>/g, AAA !== undefined ? AAA : "(error)");
+  }
 
   // objを返す
   return obj
@@ -209,7 +215,7 @@ class commentins {
     let mode;
     let price = 0;
     // THRESHOLDが1日未満なら「久しぶり」が機能しない
-    const THRESHOLD = 1000 * 60 * 60 * 24 * (day || 0); // dayがない場合はOFF
+    const THRESHOLD = 1000 * 60 * 60 * 24 * (DATAOBJ.COMMON_SWITCH.greeting_again || 0);
     const again_flag = THRESHOLD < 1000 * 60 * 60 * 24 ? 0 : 1;
 
     // ギフト(最も優先される)
@@ -231,11 +237,11 @@ class commentins {
     // 該当するおみくじがなければ初見判定
     if (!mode) {
       // meta.intervalが0なら初見
-      if (meta?.interval === 0 || testSwitch === 3) {
+      if (meta?.interval === 0 && DATAOBJ.COMMON_SWITCH.greeting_syoken || testSwitch === 3) {
         mode = "syoken";
 
         // 初見ではないのに初見と言う奴に贈る言葉(初回から5回までは無効)
-      } else if (this.comment.data.comment.includes("初見") && (!meta || meta.tc > 5) && syoken_sagi_switch) {
+      } else if (this.comment.data.comment.includes("初見") && (!meta || meta.tc > 5) && DATAOBJ.COMMON_SWITCH.greeting_sagi) {
         mode = "syoken_sagi";
 
         // meta.intervalが1000*60*60*24*day以上なら久しぶり
@@ -258,7 +264,7 @@ class commentins {
 
     // コメント無効化等でundefinedになってないなら表示
     if (obj) {
-      if (!obj.img) { obj.img = CHARACTER[obj.chara].defaultchara }
+      if (!obj.img) { obj.img = DATAOBJ.CHARACTER[obj.chara].defaultchara }
       post_WordParty(obj.img);
       post_onecome(obj.chara, obj.message);
     }
@@ -269,7 +275,7 @@ class commentins {
 // タイマー機能
 async function posttime() {
   const obj = GetMessage({}, "timer");
-  if (!obj.img) { obj.img = CHARACTER[obj.chara].defaultchara }
+  if (!obj.img) { obj.img = DATAOBJ.CHARACTER[obj.chara].defaultchara }
   post_WordParty(obj.img);
   post_onecome(obj.chara, obj.message);
 }
@@ -307,7 +313,7 @@ async function post_onecome_go(waitTime, chara, message) {
   // ID生成(コメントが上書きされないためのもの)
   const id = new Date().getTime().toString() + Math.floor(Math.random() * 1000000)
   // iconががあるなら、アイコンを追加
-  const charaicon = CHARACTER[chara].icon;
+  const charaicon = DATAOBJ.CHARACTER[chara].icon;
   if (!charaicon) charaicon = "";
   // HTTP POST
   await delaytime(waitTime);
