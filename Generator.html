@@ -2,8 +2,8 @@
 <html lang="ja">
 
 <head>
- <meta charset="UTF-8">
- <meta http-equiv="Content-Security-Policy" content="
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="
   default-src 'self';
   script-src 'self' https://cdn.jsdelivr.net 'unsafe-inline' 'unsafe-eval';
   style-src 'self' https://cdn.jsdelivr.net 'unsafe-inline';
@@ -11,67 +11,70 @@
   img-src 'self' data:;
 ">
 
- <title>チャットデコレーション! v0.4</title>
- <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vuetify@3.5.8/dist/vuetify.min.css">
- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.6/dist/sweetalert2.min.css">
+  <title>チャットデコレーション! v0.4</title>
+  <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vuetify@3.5.8/dist/vuetify.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.6/dist/sweetalert2.min.css">
 </head>
 
 
 <body>
- <div id="app">
-  <v-app :theme="DATAOBJ.PREFERENCES.theme">
+  <div id="app">
+    <v-app :theme="DATAOBJ.PREFERENCES.theme">
 
-   <!-- 左部ナビゲーション -->
-   <v-navigation-drawer color="primary" expand-on-hover rail permanent>
-    <v-list>
-     <v-list-item prepend-avatar="./img/boy01_cap01.gif" title="初見BOTちゃん"></v-list-item>
-     <v-divider></v-divider>
-     <v-list-subheader>#キャラクター</v-list-subheader>
-     <v-list-item prepend-icon="mdi-pound" title="キャラクター" subtitle="BOTのキャラ設定"
-      @click="tab = 'CHARACTER',tmp_updata()"></v-list-item>
-     <v-list-item prepend-icon="mdi-cog" title="基本設定" subtitle="機能のON/OFFなど"
-      @click="tab = 'preferences',tmp_updata()"></v-list-item>
-
-
-     <v-divider></v-divider>
-     <v-list-subheader>COMMON</v-list-subheader>
-     <v-list-item prepend-icon="mdi-palette" title="タイマー" subtitle="◯分毎にBOTが喋る機能"
-      @click="tab = 'TEXTCOLOR'"></v-list-item>
-     <v-list-item prepend-icon="mdi-image" title="ギフト・スパチャ" subtitle="ギフトへの対応" @click="tab = 'BACKCOLOR'"></v-list-item>
-     <v-list-item prepend-icon="mdi-texture" title="初見判定" subtitle="初見さんへの対応" @click="tab = 'GRADATION'"></v-list-item>
-     <v-list-item prepend-icon="mdi-texture" title="久しぶり判定" subtitle="久々の方への対応"
-      @click="tab = 'GRADATION'"></v-list-item>
-     <v-list-item prepend-icon="mdi-texture" title="いつもの挨拶" subtitle="いつメンへの対応"
-      @click="tab = 'GRADATION'"></v-list-item>
-     <v-list-item prepend-icon="mdi-unicorn" title="初見詐欺" subtitle="「初見」と偽る方へ…" @click="tab = 'IMAGES'"></v-list-item>
-     <v-list-item prepend-icon="mdi-unicorn" title="参加" subtitle="参加希望への対応" @click="tab = 'IMAGES'"></v-list-item>
-
-     <v-divider></v-divider>
-     <v-list-subheader>OMIKUJI</v-list-subheader>
-     <v-list-item prepend-icon="mdi-cog" title="OMIKUJI設定" subtitle="OMIKUJI機能の追加等"
-      @click="tab = 'preferences',tmp_updata()"></v-list-item>
-
-     <v-list-item v-for="(item, index) in DATAOBJ.OMIKUJI" :key="index">
-      <v-list-item-content>
-       <v-list-item-title>{{ index }}</v-list-item-title>
-       <v-list-item-subtitle>{{ index }}</v-list-item-subtitle>
-      </v-list-item-content>
-     </v-list-item>
-    </v-list>
+      <!-- 左部ナビゲーション -->
+      <v-navigation-drawer color="primary" expand-on-hover rail permanent>
+        <v-list>
+          <v-list-item prepend-avatar="./img/boy01_cap01.gif" title="初見BOTちゃん"></v-list-item>
+          <v-divider></v-divider>
+          <v-list-subheader>#キャラクター</v-list-subheader>
+          <v-list-item prepend-icon="mdi-pound" title="キャラクター" subtitle="BOTのキャラ設定"
+            @click="tab = 'CHARACTER',tmp_updata()"></v-list-item>
+          <v-list-item prepend-icon="mdi-cog" title="基本設定" subtitle="機能のON/OFFなど"
+            @click="tab = 'preferences',tmp_updata()"></v-list-item>
 
 
-   </v-navigation-drawer>
+          <v-divider></v-divider>
+          <v-list-subheader>COMMON</v-list-subheader>
+          <v-list-item prepend-icon="mdi-palette" title="タイマー" subtitle="◯分毎にBOTが喋る機能"
+            @click="tab = 'timer'"></v-list-item>
+          <v-list-item prepend-icon="mdi-image" title="ギフト・スパチャ" subtitle="ギフトへの対応"
+            @click="tab = 'BACKCOLOR'"></v-list-item>
+          <v-list-item prepend-icon="mdi-texture" title="初見判定" subtitle="初見さんへの対応"
+            @click="tab = 'GRADATION'"></v-list-item>
+          <v-list-item prepend-icon="mdi-texture" title="久しぶり判定" subtitle="久々の方への対応"
+            @click="tab = 'GRADATION'"></v-list-item>
+          <v-list-item prepend-icon="mdi-texture" title="いつもの挨拶" subtitle="いつメンへの対応"
+            @click="tab = 'GRADATION'"></v-list-item>
+          <v-list-item prepend-icon="mdi-unicorn" title="初見詐欺" subtitle="「初見」と偽る方へ…"
+            @click="tab = 'IMAGES'"></v-list-item>
+          <v-list-item prepend-icon="mdi-unicorn" title="参加" subtitle="参加希望への対応" @click="tab = 'IMAGES'"></v-list-item>
+
+          <v-divider></v-divider>
+          <v-list-subheader>OMIKUJI</v-list-subheader>
+          <v-list-item prepend-icon="mdi-cog" title="OMIKUJI設定" subtitle="OMIKUJI機能の追加等"
+            @click="tab = 'preferences',tmp_updata()"></v-list-item>
+
+          <v-list-item v-for="(item, index) in DATAOBJ.OMIKUJI" :key="index">
+            <v-list-item-content>
+              <v-list-item-title>{{ index }}</v-list-item-title>
+              <v-list-item-subtitle>{{ index }}</v-list-item-subtitle>
+            </v-list-item-content>
+          </v-list-item>
+        </v-list>
 
 
-   <v-main>
-    <!-- タイトルバー -->
-    <v-row>
-     <v-col cols="12" sm="6">
-      <v-img max-height="120" :src="Onecometemplate[OnecomeSelect].img"></v-img>
-     </v-col>
-     <v-col cols="12" sm="6">
-      <!--
+      </v-navigation-drawer>
+
+
+      <v-main>
+        <!-- タイトルバー -->
+        <v-row>
+          <v-col cols="12" sm="6">
+            <v-img max-height="120" :src="Onecometemplate[OnecomeSelect].img"></v-img>
+          </v-col>
+          <v-col cols="12" sm="6">
+            <!--
       <v-container class="d-flex align-end flex-column">
        <v-row>
         <v-col cols="4" sm="auto">
@@ -95,35 +98,35 @@
        </v-row>
       </v-container>
 -->
-      <!-- テーマchangeラジオボタン   -->
-      <v-row>
-       <!-- グリッドchangeラジオボタン   -->
-       <v-col cols="7">
-        <v-radio-group inline v-model="selectgridcols">
-         <template v-for="pattern in Object.keys(gridcols)">
-          <v-radio :key="pattern" v-model="selectgridcols" :value="pattern" hide-details>
-           <v-icon>{{ gridcols[pattern].icon }}</v-icon>
-          </v-radio>
-          <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-         </template>
-        </v-radio-group>
-       </v-col>
-       <!-- テーマchangeラジオボタン   -->
-       <v-col cols="5">
-        <v-radio-group inline v-model="DATAOBJ.PREFERENCES.theme">
-         <v-radio value="light">
-          <v-icon>mdi-white-balance-sunny</v-icon>
-         </v-radio>
-         <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-         <v-radio value="dark">
-          <v-icon>mdi-moon-waning-crescent</v-icon>
-         </v-radio>
-        </v-radio-group>
-       </v-col>
-      </v-row>
-     </v-col>
-    </v-row>
-    <!-- ダウンロード用ダイアログ 
+            <!-- テーマchangeラジオボタン   -->
+            <v-row>
+              <!-- グリッドchangeラジオボタン   -->
+              <v-col cols="7">
+                <v-radio-group inline v-model="selectgridcols">
+                  <template v-for="pattern in Object.keys(gridcols)">
+                    <v-radio :key="pattern" v-model="selectgridcols" :value="pattern" hide-details>
+                      <v-icon>{{ gridcols[pattern].icon }}</v-icon>
+                    </v-radio>
+                    <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                  </template>
+                </v-radio-group>
+              </v-col>
+              <!-- テーマchangeラジオボタン   -->
+              <v-col cols="5">
+                <v-radio-group inline v-model="DATAOBJ.PREFERENCES.theme">
+                  <v-radio value="light">
+                    <v-icon>mdi-white-balance-sunny</v-icon>
+                  </v-radio>
+                  <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                  <v-radio value="dark">
+                    <v-icon>mdi-moon-waning-crescent</v-icon>
+                  </v-radio>
+                </v-radio-group>
+              </v-col>
+            </v-row>
+          </v-col>
+        </v-row>
+        <!-- ダウンロード用ダイアログ 
     <v-dialog v-model="dialog[55]" max-width="800">
      <v-card height="600">
       <v-container class="text-center row-gap-4">
@@ -163,133 +166,158 @@
     </v-dialog>
 -->
 
-    <!-- 1.CHARACTER -->
-    <v-container v-show="tab === 'CHARACTER'">
+        <!-- 1.CHARACTER -->
+        <v-container v-if="tab === 'CHARACTER'">
 
-     <!-- タイトル+空のデータ追加ボタン -->
-     <d_titlebar title="キャラクター" @addbtn="NullAddImage('BASIC_IMAGES')"></d_titlebar>
+          <!-- タイトル+空のデータ追加ボタン -->
+          <d_titlebar title="キャラクター" @addbtn="NullAddImage('BASIC_IMAGES')"></d_titlebar>
 
-     <!-- BASIC_deco リスト表示 -->
-     <draggable v-model="tmp.CHARACTER" tag="v-row" :item-key="(item, index) => index">
-      <template #item="{ element, index }">
-       <grid_v-card :select="selectgridcols" @dialogbtn="dialog[index] = true">
-        <v-toolbar density="compact" color="transparent">
-         <v-toolbar-title class="text-h5">{{element.key}}</v-toolbar-title>
-         <template v-slot:append>
-          <v-btn height="30" width="30" icon @click.stop="clearImageArr('BASIC_IMAGES', element,index)">
-           <v-icon>mdi-close</v-icon>
-           <v-tooltip activator="parent" location="bottom">この設定を消去</v-tooltip>
-          </v-btn>
-         </template>
-        </v-toolbar>
-       </grid_v-card>
-      </template>
-     </draggable>
+          <!-- CHARACTER リスト -->
+          <draggable v-model="tmp.CHARACTER" tag="v-row" :item-key="(item, index) => index">
+            <template #item="{ element, index }">
+              <grid_v-card :select="selectgridcols" :character="DATAOBJ.CHARACTER[element.key]" :element="element"
+                :index="index" @click="dialog[index] = true">
+                <v-toolbar density="compact" color="transparent">
+                  <v-toolbar-title class="text-h5">{{element.key}}</v-toolbar-title>
+                </v-toolbar>
+              </grid_v-card>
+            </template>
+          </draggable>
 
-     <!-- カードごとのダイアログ(詳細) -->
-     <v-dialog v-model="dialog[index]" max-width="800" v-for="(value, index) in tmp.CHARACTER" :key="index">
-      <v-card height="450">
-       <v-toolbar density="compact">
-        <v-toolbar-title>{{value.key}}</v-toolbar-title>
-       </v-toolbar>
+          <!-- CHARACTER ダイアログ -->
+          <v-dialog v-model="dialog[index]" max-width="800" v-for="(value, index) in tmp.CHARACTER" :key="index">
+            <v-card height="450">
+              <v-toolbar density="compact">
+                <v-toolbar-title>{{value.key}}
+                  <name_changer_button :newtext="value.key" @text-changed="value.key = $event"></name_changer_button>
+                </v-toolbar-title>
+              </v-toolbar>
 
-       <v-card-text>
-        <v-row>
-         <v-col cols="12" sm="5">
-          <bannercard :value="value"></bannercard>
-         </v-col>
-         <v-col cols="12" sm="7">
-          <v-row>
-           <v-col cols="10"> <!-- テキストフィールド -->
-            <v-text-field v-model="value['--lcv-name-color']" label="名前色"></v-text-field>
-           </v-col>
-           <v-col cols="2"> <!-- ボタン -->
-            <v-btn icon @click="openColorPicker('name')">
-             <v-icon>mdi-palette</v-icon>
-            </v-btn>
-           </v-col>
-          </v-row>
-          <v-row>
-           <v-col cols="10"> <!-- テキストフィールド -->
-            <v-text-field v-model="value['--lcv-text-color']" label="テキスト色"></v-text-field>
-           </v-col>
-           <v-col cols="2"> <!-- ボタン -->
-            <v-btn icon @click="openColorPicker('text')">
-             <v-icon>mdi-palette</v-icon>
-            </v-btn>
-           </v-col>
-          </v-row>
-          <v-row>
-           <v-col cols="10"> <!-- テキストフィールド -->
-            <v-text-field v-model="value['--lcv-background-color']" label="背景色"></v-text-field>
-           </v-col>
-           <v-col cols="2"> <!-- ボタン -->
-            <v-btn icon @click="openColorPicker('background')">
-             <v-icon>mdi-palette</v-icon>
-            </v-btn>
-           </v-col>
-          </v-row>
-         </v-col>
-       </v-card-text>
-      </v-card>
-     </v-dialog>
+              <v-card-text>
+                <v-row>
+                  <v-col cols="12" sm="5">
+                    <bannercard :value="value"></bannercard>
+                  </v-col>
+                  <v-col cols="12" sm="7">
+                    <!-- 名前色 -->
+                    <color_choose :color="value['--lcv-name-color']" colorname="名前色"
+                      @color-selected="value['--lcv-name-color'] = $event">
+                    </color_choose>
+
+                    <!-- テキスト色 -->
+                    <color_choose :color="value['--lcv-text-color']" colorname="テキスト色"
+                      @color-selected="value['--lcv-text-color'] = $event">
+                    </color_choose>
+
+                    <!-- 背景色 -->
+                    <color_choose :color="value['--lcv-background-color']" colorname="背景色"
+                      @color-selected="value['--lcv-background-color'] = $event">
+                    </color_choose>
+
+                  </v-col>
+              </v-card-text>
+            </v-card>
+          </v-dialog>
+        </v-container>
+        <!--
+              <grid_v-card :select="selectgridcols" :character="DATAOBJ.CHARACTER[element.key]" @dialogbtn="dialog[index] = true">
+                <v-toolbar density="compact" color="transparent">
+                  <v-toolbar-title class="text-h5">{{element.key}}</v-toolbar-title>
+                  <template v-slot:append>
+                    <v-btn height="30" width="30" icon @click.stop="clearImageArr('BASIC_IMAGES', element,index)">
+                      <v-icon>mdi-close</v-icon>
+                      <v-tooltip activator="parent" location="bottom">この設定を消去</v-tooltip>
+                    </v-btn>
+                  </template>
+                </v-toolbar>
+              </grid_v-card>
+-->
 
 
 
+        <!-- 2-1.timer -->
+        <v-container v-if="tab === 'timer'">
+
+          <!-- タイトル+空のデータ追加ボタン -->
+          <d_titlebar title="タイマー" @addbtn="NullAddImage('BASIC_IMAGES')"></d_titlebar>
+
+          <!-- BASIC_deco リスト表示 -->
+          <draggable v-model="DATAOBJ.COMMON.timer" tag="v-row" :item-key="(item, index) => index">
+            <template #item="{ element, index }">
+              <commoncard :obj="DATAOBJ.COMMON.timer" :select="selectgridcols"
+                :character="DATAOBJ.CHARACTER[element.chara]" :element="element" :index="index"
+                @click="dialog[index] = true"></commoncard>
+            </template>
+          </draggable>
+
+
+          <!-- カードごとのダイアログ(詳細)  -->
+          <v-dialog v-model="dialog[index]" max-width="800" v-for="(value, index) in DATAOBJ.COMMON.timer" :key="index">
+            <v-card height="450">
+              <v-toolbar density="compact">
+                <v-toolbar-title># {{index+1}}</v-toolbar-title>
+              </v-toolbar>
+
+              <v-card-text>
+                <v-row>
+                  <v-col cols="3" sm="2">
+                    <v-text-field type="number" v-model="value.ran" label="Weight" min="0" max="100">
+                      <v-tooltip activator="parent" location="bottom">ランダムに偏りをつける</v-tooltip>
+                    </v-text-field>
+                  </v-col>
+                  <v-col align-self="center">
+                    <v-progress-linear :model-value="sumRanValues(value.ran,'timer')" buffer-value="10" color="primary"
+                      height="35" striped>出現割合：{{sumRanValues(value.ran,'timer')}}
+                      %</v-progress-linear>
+                  </v-col>
+                </v-row>
+                <div>・message</div>
+  <v-container>
+    <v-row v-for="(item, index) in talk2Array(value.message)" :key="index">
+      <v-col cols="8">
+        <v-text-field v-model="value.message[item]" outlined label="キー" dense></v-text-field>
+      </v-col>
+      <v-col cols="2">
+        {{ Object.keys(item) }}
+      </v-col>
+    </v-row>
+    <v-btn color="primary" @click="addItem">追加</v-btn>
+  </v-container>
 
 
 
-    </v-container>
 
-    <!-- カードごとのダイアログ(詳細) 
-     <v-dialog v-model="dialog[index]" max-width="800" v-for="(value, index) in DATAOBJ.BASIC_IMAGES" :key="index">
-      <v-card height="450">
-       <v-toolbar density="compact" :style="getDecorationStyle(value,4)">
-        <v-toolbar-title># {{index+1}}</v-toolbar-title>
-       </v-toolbar>
+                <div>・img</div>
 
-       <v-card-text>
-        <v-row>
-         <v-col cols="3" sm="2">
-          <v-text-field type="number" v-model="value.ran" label="Weight" min="0" max="100">
-           <v-tooltip activator="parent" location="bottom">ランダムに偏りをつける</v-tooltip>
-          </v-text-field>
-         </v-col>
-         <v-col align-self="center">
-          <v-progress-linear :model-value="sumRanValues(value.ran)" buffer-value="10" color="primary" height="35"
-           striped>出現割合：{{sumRanValues(value.ran)}}
-           %</v-progress-linear>
-         </v-col>
-        </v-row>
+                <!--
 
-        <bannercard :bannerstyle="getDecorationStyle(value)"></bannercard>
+                <v-row>
 
-        <v-row>
+                  <d_textcolor :colors="DATAOBJ.TEXTCOLOR" :target="value.text"
+                    @selected="handleCOLOR('BASIC_IMAGES',index,'text',$event)">
+                  </d_textcolor>
 
-         <d_textcolor :colors="DATAOBJ.TEXTCOLOR" :target="value.text"
-          @selected="handleCOLOR('BASIC_IMAGES',index,'text',$event)">
-         </d_textcolor>
+                  <d_backcolor :colors="DATAOBJ.BACKCOLOR" :target="value.back" :btnstyle="getDecorationStyle(value, 4)"
+                    :liststyle="DATAOBJ.TEXTCOLOR[value.text].color"
+                    @selected="handleCOLOR('BASIC_IMAGES',index, 'back', $event)">
+                  </d_backcolor>
 
-         <d_backcolor :colors="DATAOBJ.BACKCOLOR" :target="value.back" :btnstyle="getDecorationStyle(value, 4)"
-          :liststyle="DATAOBJ.TEXTCOLOR[value.text].color"
-          @selected="handleCOLOR('BASIC_IMAGES',index, 'back', $event)">
-         </d_backcolor>
+                  <d_gradation :colors="DATAOBJ.GRADATION" :target="value.gradation"
+                    :btnstyle="getDecorationStyle(value, 1)"
+                    @selected="handleCOLOR('BASIC_IMAGES',index, 'gradation', $event)">
+                  </d_gradation>
 
-         <d_gradation :colors="DATAOBJ.GRADATION" :target="value.gradation" :btnstyle="getDecorationStyle(value, 1)"
-          @selected="handleCOLOR('BASIC_IMAGES',index, 'gradation', $event)">
-         </d_gradation>
+                  <d_images :colors="DATAOBJ.IMAGES" :target="value.img" :btnstyle="getDecorationStyle(value,2)"
+                    :images_dir="images_dir" @selected="handleCOLOR('BASIC_IMAGES',index, 'img', $event)">
+                  </d_images>
+                -->
+                </v-row>
+              </v-card-text>
+            </v-card>
+          </v-dialog>
 
-         <d_images :colors="DATAOBJ.IMAGES" :target="value.img" :btnstyle="getDecorationStyle(value,2)"
-          :images_dir="images_dir" @selected="handleCOLOR('BASIC_IMAGES',index, 'img', $event)">
-         </d_images>
 
-        </v-row>
-       </v-card-text>
-      </v-card>
-     </v-dialog>
-    -->
-
-    <!--
+          <!--
          <div style="position: absolute; bottom: 5px; left: 5px;">出現確率 : {{element.ran}}
           ({{sumRanValues(element.ran)}}%)
 
@@ -315,29 +343,30 @@
 -->
 
 
-   </v-main>
+      </v-main>
 
-   <!-- スナックバー表示 -->
-   <v-snackbar v-model="snackbar.clear" :timeout="2000">削除したよ。</v-snackbar>
-   <v-snackbar v-model="snackbar.new" :timeout="2000">新しく追加したよ。</v-snackbar>
-   <v-snackbar v-model="snackbar.newstop" :timeout="2000">これ以上新しく追加できないよ。</v-snackbar>
-  </v-app>
- </div>
+      <!-- スナックバー表示 -->
+      <v-snackbar v-model="snackbar.clear" :timeout="2000">削除したよ。</v-snackbar>
+      <v-snackbar v-model="snackbar.new" :timeout="2000">新しく追加したよ。</v-snackbar>
+      <v-snackbar v-model="snackbar.newstop" :timeout="2000">これ以上新しく追加できないよ。</v-snackbar>
+    </v-app>
+  </div>
 
 
- <script src="https://cdn.jsdelivr.net/npm/typescript@5.4.4/lib/typescript.min.js"></script>
- <script src="https://cdn.jsdelivr.net/npm/vue@3.4.21/dist/vue.global.prod.min.js"></script>
- <script src="https://cdn.jsdelivr.net/npm/vuetify@3.5.8/dist/vuetify.min.js"></script>
- <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.10.2/Sortable.min.js"></script>
- <script src="https://cdn.jsdelivr.net/npm/vuedraggable@4.0.2/dist/vuedraggable.umd.min.js"></script>
- <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.6/dist/sweetalert2.all.min.js"></script>
- <script src="./_lib/ELDERTEMPLATE.js"></script>
- <script src="./userData.js"></script>
- <script src="./Generator.js"></script>
- <script src="./Generator_COMP.js"></script>
- <script>
+  <script src="https://cdn.jsdelivr.net/npm/typescript@5.4.4/lib/typescript.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue@3.4.21/dist/vue.global.prod.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vuetify@3.5.8/dist/vuetify.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.10.2/Sortable.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vuedraggable@4.0.2/dist/vuedraggable.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.6/dist/sweetalert2.all.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue3-line-clamp@1.0.2/index.min.js"></script>
+  <script src="./_lib/ELDERTEMPLATE.js"></script>
+  <script src="./userData.js"></script>
+  <script src="./Generator.js"></script>
+  <script src="./Generator_COMP.js"></script>
+  <script>
 
- </script>
+  </script>
 </body>
 
 </html>
