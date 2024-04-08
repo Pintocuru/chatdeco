@@ -275,8 +275,7 @@ class commentins {
 // タイマー機能
 async function posttime() {
   const obj = GetMessage({}, "timer");
-  if (!obj.img) { obj.img = DATAOBJ.CHARACTER[obj.chara].defaultchara }
-  post_WordParty(obj.img);
+  post_WordParty(obj.img || (DATAOBJ.CHARACTER[obj.chara]?.defaultchara));
   post_onecome(obj.chara, obj.message);
 }
 
@@ -297,24 +296,18 @@ if (!activeFrameId || activeFrameId === "") {
 // ↓使用例: 1.5秒後に、「待ち受けキャラ名」の名前で、わんコメにコメントとして投稿します
 // YouTubeやTwitch等のチャット欄には投稿されません
 // post_onecome("ゆっくり霊夢","ゆっくりしていってね!");
-function post_onecome(chara, Obj) {
-  // Objが配列でない場合は配列に変換
-  if (!Array.isArray(Obj)) {
-    Obj = [{ [Obj]: 0 }];
-  }
-  for (const obj of Obj) {
-    const message = Object.keys(obj)[0];
-    const waitTime = Math.max(basicdelay + obj[message], 0);
-    post_onecome_go(waitTime, chara, message);
-  }
+function post_onecome(chara, arr) {
+  // 配列でない場合は配列に変換
+  arr = Array.isArray(arr) ? arr : [[arr, 0]];
+  arr.forEach(([message, waitTime]) => post_onecome_go(message, basicdelay + waitTime, chara));
 }
 // コメント投稿の実行
-async function post_onecome_go(waitTime, chara, message) {
+async function post_onecome_go(message, waitTime, chara) {
   // ID生成(コメントが上書きされないためのもの)
   const id = new Date().getTime().toString() + Math.floor(Math.random() * 1000000)
   // iconががあるなら、アイコンを追加
-  const charaicon = DATAOBJ.CHARACTER[chara].icon;
-  if (!charaicon) charaicon = "";
+  const charaicon = DATAOBJ.CHARACTER[chara]?.icon || "";
+
   // HTTP POST
   await delaytime(waitTime);
   const onecome = {
@@ -327,19 +320,14 @@ async function post_onecome_go(waitTime, chara, message) {
 // Wordparty Obj
 // ↓使用例: 1.5秒後に、WordPartyに「初見」で反応する演出が出ます
 // post_WordParty([{"初見":1500},]);
-function post_WordParty(Obj) {
-  // Objが配列でない場合は配列に変換
-  if (!Array.isArray(Obj)) {
-    Obj = [{ [Obj]: 0 }];
-  }
-  for (const obj of Obj) {
-    const pattern = Object.keys(obj)[0];
-    const waitTime = Math.max(basicdelay + obj[pattern], 0);
-    post_WordParty_go(waitTime, pattern);
-  }
+function post_WordParty(arr) {
+  // 配列でない場合は配列に変換
+  arr = Array.isArray(arr) ? arr : [[arr, 0]];
+  arr.forEach(([pattern, waitTime]) => post_WordParty_go(pattern, basicdelay + waitTime));
+
 }
 // Wordpartyの実行
-async function post_WordParty_go(waitTime, pattern) {
+async function post_WordParty_go(pattern, waitTime) {
   await delaytime(waitTime);
   await OneSDK.post("http://localhost:11180/api/reactions", {
     reactions: [{ key: pattern, value: 1, },]
@@ -348,7 +336,9 @@ async function post_WordParty_go(waitTime, pattern) {
 
 // 遅延function
 async function delaytime(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+  // 秒であれば1000倍にする
+  ms = ms <= 30 ? ms * 1000 : ms;
+  return new Promise((resolve) => setTimeout(resolve, Math.max(ms, 0)));
 }
 
 // Singlelottery

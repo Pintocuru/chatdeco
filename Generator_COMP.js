@@ -64,6 +64,55 @@ app.component('grid_v-card', {
 
 
 
+// カラーテキストとダイアログ表示
+app.component('name_changer_button', {
+  props: ['newtext'],
+  data() {
+    return {
+      dialog: false,
+      newText: this.newtext
+    };
+  },
+  methods: {
+    confirmChange() {
+      // Emit event with selected text
+      this.$emit('text-changed', this.newText);
+      // Close dialog
+      this.dialog = false;
+    },
+    cancelChange() {
+      // Close dialog without changing text
+      this.dialog = false;
+    }
+  },
+  template: `
+    <v-dialog v-model="dialog" max-width="500px">
+      <template v-slot:activator="{ on }">
+        <v-btn icon  v-on:click="dialog = !dialog">
+          <v-icon>mdi-pencil</v-icon>
+          <v-tooltip activator="parent" location="bottom">テキストを変更する</v-tooltip>
+        </v-btn>
+      </template>
+      <v-card>
+        <v-card-title>テキストを変更する</v-card-title>
+        <v-card-text>
+          <v-text-field v-model="newText" label="新しいテキスト"></v-text-field>
+        </v-card-text>
+      <v-card-actions>
+      <v-row>
+       <v-col cols="6">
+        <v-btn block variant="flat" color="primary" @click="confirmChange">OK</v-btn>
+      </v-col>
+       <v-col cols="6">
+        <v-btn block @click="cancelChange">Cancel</v-btn>
+      </v-col>
+    </v-row>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+     `
+});
+
 
 // フキダシテスト表示
 app.component('bannercard', {
@@ -111,22 +160,22 @@ app.component('color_choose', {
     };
   },
   methods: {
-    // OK:親へEmitで送信
-    confirmColor() {
-      this.$emit('color-selected', this.selectedColor);
+    // ダイアログOK:親へEmitで送信
+    dialogOK() {
+      this.$emit('choose', this.selectedColor);
       this.dialog = false;
     },
-    // キャンセル
-    cancelColor() {
+    // ダイアログキャンセル
+    dialogcancel() {
       this.dialog = false;
-    }
+    },
   },
   template: `
   <v-dialog v-model="dialog" max-width="500px">
     <template v-slot:activator="{ on }">
     <v-row>
     <v-col>
-     <v-text-field v-model="color" :label="colorname"></v-text-field>
+     <v-text-field v-model="selectedColor" :label="colorname" @input="dialogOK"></v-text-field>
     </v-col>
      <v-col cols="auto">
       <v-btn icon :color="color" v-on:click="dialog = !dialog">
@@ -144,10 +193,10 @@ app.component('color_choose', {
       <v-card-actions>
       <v-row>
        <v-col cols="6">
-        <v-btn block variant="flat" color="primary" @click="confirmColor">OK</v-btn>
+        <v-btn block variant="flat" color="primary" @click="dialogOK">OK</v-btn>
       </v-col>
        <v-col cols="6">
-        <v-btn block @click="cancelColor">Cancel</v-btn>
+        <v-btn block @click="dialogcancel">Cancel</v-btn>
       </v-col>
     </v-row>
       </v-card-actions>

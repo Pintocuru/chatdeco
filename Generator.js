@@ -4,6 +4,10 @@ const vuetify = Vuetify.createVuetify();
 
 const app = Vue.createApp({
   data: () => ({
+    dialog2: false,//test
+    dialogIndex2: null,//test
+
+
     tab: 'CHARACTER', // ナビゲーション BASIC_deco
     images_dir: "", // 画像ディレクトリ
     selectgridcols: "pattern2", // アイテムの並べ方
@@ -36,7 +40,7 @@ const app = Vue.createApp({
       GRADATION: ELDERTEMPLATE.GRADATION,
       IMAGES: ELDERTEMPLATE.IMAGES,
     },
-    DATAOBJ: __USER__DATAOBJ,
+    DATAOBJ: DATAOBJ,
     tmp: {},
   }),
   created() {
@@ -75,12 +79,19 @@ const app = Vue.createApp({
 
 
   methods: {
+//test
+    openDialog(index) {
+      console.log(index);
+      this.dialog2 = true;
+      this.dialogIndex2 = index;
+    },
+
+
+
     // message、imgが配列でないなら配列にする
+    // (仮設置。本番ではデータ読み込み時に配列にする)
     talk2Array(data) {
-      if (!Array.isArray(data)) {
-        return [{ [data]: 0 }];
-      }
-      return data;
+      return Array.isArray(data) ? data : [[data, 0]];
     },
 
     // CHARACTER がObjectなら配列にする
@@ -137,8 +148,178 @@ const app = Vue.createApp({
 
 
 
+// COMMON ダイアログ表示
+app.component('commondialog', {
+  props: ['index', 'obj', 'character', 'model'],
+  data() {
+    return {
+      currentIndex: this.index 
+    };
+  },
+  watch: {
+    index(newValue) {
+      this.currentIndex = newValue; // indexの変更を監視し、currentIndexを更新
+    }
+  },
+  created() {
+    // 初回表示時にcurrentIndexを設定
+    this.currentIndex = this.index;
 
-// リスト表示＋ダイアログ表示
+    // データが配列でなければ配列にする
+    this.obj.forEach(obj => {
+      for (const field of ['message', 'img']) {
+        // キー自体がなければ生成,配列でないなら配列にする
+        obj[field] ??= [];
+        obj[field] = !Array.isArray(obj[field]) ? [[obj[field], 0]] : obj[field];
+      }
+    });
+  },
+  methods: {
+    sumRanValues(num) {
+      const total = this.obj.reduce((sum, obj) => sum + (obj.hasOwnProperty('ran') ? parseInt(obj.ran) : 0), 0);
+      return Math.round((num / total) * 100);
+    },
+    talk2Array(data) {
+      return Array.isArray(data) ? data : [[data, 0]];
+    },
+    removeItem(ind,mode) {
+      this.obj[this.index][mode].splice(ind, 1);
+    },
+    // message img のセリフ追加
+    addArray(value) {
+      value.push(['', 0]);
+    },
+  },
+  template: `
+  <v-dialog v-model="dialog" max-width="800">
+    <template v-for="(value, index) in obj" :key="index">
+      <v-card height="600" v-if="currentIndex === index">
+
+       <v-toolbar density="compact"
+        :style="{backgroundColor: character[value.chara]['--lcv-background-color']}">
+        <v-toolbar-title># {{index+1}}</v-toolbar-title>
+       </v-toolbar>
+       <v-card-text>
+
+        <!-- ran  -->
+        <v-row>
+         <v-col cols="auto">
+          <v-text-field type="number" v-model="value.ran" label="Weight" min="0" max="100">
+           <v-tooltip activator="parent" location="bottom">ランダムに偏りをつける</v-tooltip>
+          </v-text-field>
+         </v-col>
+         <v-col align-self="center">
+          <v-progress-linear :model-value="sumRanValues(value.ran)" buffer-value="10" color="primary"
+           height="35" striped>出現割合：{{sumRanValues(value.ran)}}
+           %</v-progress-linear>
+         </v-col>
+        </v-row>
+
+        <!-- chara  -->
+        <v-toolbar density="compact">
+         <v-toolbar-title>
+          <v-icon>mdi-robot</v-icon> キャラクター
+         </v-toolbar-title>
+        </v-toolbar>
+        <v-container>
+         <v-radio-group inline v-model="value.chara">
+          <v-radio v-for="(item, key) in character" :key="key" :label="key" :value="key">
+          </v-radio>
+         </v-radio-group>
+        </v-container>
+
+        <!-- message  -->
+        <v-toolbar density="compact">
+         <v-toolbar-title>
+          <v-icon>mdi-chat</v-icon> message
+         </v-toolbar-title>
+        </v-toolbar>
+        <v-row v-for="(item, index) in talk2Array(value.message)" :key="index" no-gutters>
+         <v-col>
+          <v-sheet class="pr-4">
+           <v-text-field v-model="item[0]" outlined label="message" dense>
+            <v-tooltip activator="parent" location="bottom">BOTが話すメッセージ</v-tooltip>
+           </v-text-field>
+          </v-sheet>
+         </v-col>
+         <v-col cols="auto">
+          <v-sheet>
+           <v-text-field type="number" v-model="item[1]" label="秒数" min="-2" max="30" step="0.1">
+            <v-tooltip activator="parent" location="bottom">BOTがメッセージするまでの待機時間(秒)</v-tooltip>
+           </v-text-field>
+          </v-sheet>
+         </v-col>
+         <v-col cols="auto">
+          <v-btn @click="removeItem(index,'message')" icon>
+          <v-icon>mdi-delete</v-icon>
+         </v-btn>
+        </v-col>
+        </v-row>
+        <v-row no-gutters v-show="value.message.length < 10">
+         <v-col>
+          <v-sheet class="pb-10">
+           <v-btn block color="secondary" @click="addArray(value.message)">
+            <v-icon>mdi-plus-circle-outline</v-icon>
+            <v-tooltip activator="parent" location="bottom">メッセージを追加する</v-tooltip>
+           </v-btn>
+          </v-sheet>
+         </v-col>
+        </v-row>
+
+
+        <!-- img  -->
+        <v-toolbar density="compact">
+         <v-toolbar-title>
+          <v-icon>mdi-party-popper</v-icon> WordParty
+         </v-toolbar-title>
+        </v-toolbar>
+        <v-row v-for="(item, index) in talk2Array(value.img)" :key="index" no-gutters>
+         <v-col>
+          <v-sheet class="pr-4">
+           <v-text-field v-model="item[0]" outlined label="message" dense>
+            <v-tooltip activator="parent" location="bottom">発火するWordParty</v-tooltip>
+           </v-text-field>
+          </v-sheet>
+         </v-col>
+         <v-col cols="auto">
+          <v-sheet>
+           <v-text-field type="number" v-model="item[1]" label="秒数" min="-2" max="30" step="0.1">
+            <v-tooltip activator="parent" location="bottom">WordPartyを発火するまでの待機時間(秒)</v-tooltip>
+           </v-text-field>
+          </v-sheet>
+         </v-col>
+         <v-col cols="auto">
+          <v-btn @click="removeItem(index,'img')" icon>
+          <v-icon>mdi-delete</v-icon>
+         </v-btn>
+        </v-col>
+
+        </v-row>
+        <v-row no-gutters v-show="value.message.length < 10">
+         <v-col>
+          <v-sheet class="pb-10">
+           <v-btn block color="secondary" @click="addArray(value.img)">
+            <v-icon>mdi-plus-circle-outline</v-icon>
+            <v-tooltip activator="parent" location="bottom">WordPartyを追加する</v-tooltip>
+           </v-btn>
+          </v-sheet>
+         </v-col>
+        </v-row>
+       </v-card-text>
+
+
+
+      </v-card>
+    </template>
+  </v-dialog>
+  `
+})
+
+
+
+
+
+// ?????????(削除？)
 app.component('common_v-card', {
   props: ['color', 'colorname'],
   data() {
@@ -195,9 +376,9 @@ app.component('common_v-card', {
 
 
 
-// リスト表示
+// COMMON リスト表示
 app.component('commoncard', {
-  props: ['select', 'character', 'obj', 'element', 'index',],
+  props: ['select', 'charaobj', 'obj', 'element', 'index',],
   data() {
     return {
     };
@@ -210,7 +391,7 @@ app.component('commoncard', {
     },
   },
   template: `
-    <grid_v-card :select="select" :character="character">
+    <grid_v-card :select="select" :character="charaobj[element.chara]">
       <v-card-text>
         <div v-line-clamp="2">{{ element.message }}</div>
       </v-card-text>
@@ -617,57 +798,6 @@ app.component('test', {
   */
 
 
-
-
-
-// カラーテキストとダイアログ表示
-app.component('name_changer_button', {
-  props: ['newtext'],
-  data() {
-    return {
-      dialog: false,
-      newText: this.newtext
-    };
-  },
-  methods: {
-    confirmChange() {
-      // Emit event with selected text
-      this.$emit('text-changed', this.newText);
-      // Close dialog
-      this.dialog = false;
-    },
-    cancelChange() {
-      // Close dialog without changing text
-      this.dialog = false;
-    }
-  },
-  template: `
-    <v-dialog v-model="dialog" max-width="500px">
-      <template v-slot:activator="{ on }">
-        <v-btn icon  v-on:click="dialog = !dialog">
-          <v-icon>mdi-pencil</v-icon>
-          <v-tooltip activator="parent" location="bottom">テキストを変更する</v-tooltip>
-        </v-btn>
-      </template>
-      <v-card>
-        <v-card-title>テキストを変更する</v-card-title>
-        <v-card-text>
-          <v-text-field v-model="newText" label="新しいテキスト"></v-text-field>
-        </v-card-text>
-      <v-card-actions>
-      <v-row>
-       <v-col cols="6">
-        <v-btn block variant="flat" color="primary" @click="confirmChange">OK</v-btn>
-      </v-col>
-       <v-col cols="6">
-        <v-btn block @click="cancelChange">Cancel</v-btn>
-      </v-col>
-    </v-row>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
-     `
-});
 
 
 

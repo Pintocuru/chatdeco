@@ -201,17 +201,17 @@
                   <v-col cols="12" sm="7">
                     <!-- 名前色 -->
                     <color_choose :color="value['--lcv-name-color']" colorname="名前色"
-                      @color-selected="value['--lcv-name-color'] = $event">
+                      @choose="value['--lcv-name-color'] = $event">
                     </color_choose>
 
                     <!-- テキスト色 -->
                     <color_choose :color="value['--lcv-text-color']" colorname="テキスト色"
-                      @color-selected="value['--lcv-text-color'] = $event">
+                      @choose="value['--lcv-text-color'] = $event">
                     </color_choose>
 
                     <!-- 背景色 -->
                     <color_choose :color="value['--lcv-background-color']" colorname="背景色"
-                      @color-selected="value['--lcv-background-color'] = $event">
+                      @choose="value['--lcv-background-color'] = $event">
                     </color_choose>
 
                   </v-col>
@@ -241,55 +241,129 @@
           <!-- タイトル+空のデータ追加ボタン -->
           <d_titlebar title="タイマー" @addbtn="NullAddImage('BASIC_IMAGES')"></d_titlebar>
 
-          <!-- BASIC_deco リスト表示 -->
+          <!-- リスト表示 -->
           <draggable v-model="DATAOBJ.COMMON.timer" tag="v-row" :item-key="(item, index) => index">
             <template #item="{ element, index }">
               <commoncard :obj="DATAOBJ.COMMON.timer" :select="selectgridcols"
-                :character="DATAOBJ.CHARACTER[element.chara]" :element="element" :index="index"
-                @click="dialog[index] = true"></commoncard>
+                :charaobj="DATAOBJ.CHARACTER" :element="element" :index="index"
+                @click="openDialog(index)"></commoncard>
             </template>
           </draggable>
-
-
-          <!-- カードごとのダイアログ(詳細)  -->
-          <v-dialog v-model="dialog[index]" max-width="800" v-for="(value, index) in DATAOBJ.COMMON.timer" :key="index">
-            <v-card height="450">
-              <v-toolbar density="compact">
-                <v-toolbar-title># {{index+1}}</v-toolbar-title>
-              </v-toolbar>
-
-              <v-card-text>
-                <v-row>
-                  <v-col cols="3" sm="2">
-                    <v-text-field type="number" v-model="value.ran" label="Weight" min="0" max="100">
-                      <v-tooltip activator="parent" location="bottom">ランダムに偏りをつける</v-tooltip>
-                    </v-text-field>
-                  </v-col>
-                  <v-col align-self="center">
-                    <v-progress-linear :model-value="sumRanValues(value.ran,'timer')" buffer-value="10" color="primary"
-                      height="35" striped>出現割合：{{sumRanValues(value.ran,'timer')}}
-                      %</v-progress-linear>
-                  </v-col>
-                </v-row>
-                <div>・message</div>
-  <v-container>
-    <v-row v-for="(item, index) in talk2Array(value.message)" :key="index">
-      <v-col cols="8">
-        <v-text-field v-model="value.message[item]" outlined label="キー" dense></v-text-field>
-      </v-col>
-      <v-col cols="2">
-        {{ Object.keys(item) }}
-      </v-col>
-    </v-row>
-    <v-btn color="primary" @click="addItem">追加</v-btn>
-  </v-container>
+          
+          <!-- ダイアログ表示 -->
+          <commondialog v-model="dialog2" :index="dialogIndex2" :obj="DATAOBJ.COMMON.timer"
+            :character="DATAOBJ.CHARACTER"></commondialog>
 
 
 
 
-                <div>・img</div>
 
-                <!--
+          <!-- カードごとのダイアログ(詳細)  
+     <v-dialog v-model="dialog[index]" max-width="800" v-for="(value, index) in DATAOBJ.COMMON.timer" :key="index">
+      <v-card height="600">
+       <v-toolbar density="compact"
+        :style="{backgroundColor: DATAOBJ.CHARACTER[value.chara]['--lcv-background-color']}">
+        <v-toolbar-title># {{index+1}}</v-toolbar-title>
+       </v-toolbar>
+
+       <v-card-text>
+
+        <v-row>
+         <v-col cols="auto">
+          <v-text-field type="number" v-model="value.ran" label="Weight" min="0" max="100">
+           <v-tooltip activator="parent" location="bottom">ランダムに偏りをつける</v-tooltip>
+          </v-text-field>
+         </v-col>
+         <v-col align-self="center">
+          <v-progress-linear :model-value="sumRanValues(value.ran,'timer')" buffer-value="10" color="primary"
+           height="35" striped>出現割合：{{sumRanValues(value.ran,'timer')}}
+           %</v-progress-linear>
+         </v-col>
+        </v-row>
+
+        <v-toolbar density="compact">
+         <v-toolbar-title>
+          <v-icon>mdi-robot</v-icon> キャラクター
+         </v-toolbar-title>
+        </v-toolbar>
+        <v-container>
+         <v-radio-group inline v-model="value.chara">
+          <v-radio v-for="(item, key) in DATAOBJ.CHARACTER" :key="key" :label="key" :value="key">
+          </v-radio>
+         </v-radio-group>
+        </v-container>
+
+        <v-toolbar density="compact">
+         <v-toolbar-title>
+          <v-icon>mdi-chat</v-icon> message
+         </v-toolbar-title>
+        </v-toolbar>
+        <v-row v-for="(item, index) in talk2Array(value.message)" :key="index" no-gutters>
+         <v-col>
+          <v-sheet class="pr-4">
+           <v-text-field v-model="item[0]" outlined label="message" dense>
+            <v-tooltip activator="parent" location="bottom">BOTが話すメッセージ</v-tooltip>
+           </v-text-field>
+          </v-sheet>
+         </v-col>
+         <v-col cols="auto">
+          <v-sheet>
+           <v-text-field type="number" v-model="item[1]" label="秒数" min="-2" max="30" step="0.1">
+            <v-tooltip activator="parent" location="bottom">BOTがメッセージするまでの待機時間(秒)</v-tooltip>
+           </v-text-field>
+          </v-sheet>
+         </v-col>
+        </v-row>
+        <v-row no-gutters>
+         <v-col>
+          <v-sheet class="pb-10">
+           <v-btn block color="secondary" @click="value.message.push(['',0])">
+            <v-icon>mdi-plus-circle-outline</v-icon>
+            <v-tooltip activator="parent" location="bottom">メッセージを追加する</v-tooltip>
+           </v-btn>
+          </v-sheet>
+         </v-col>
+        </v-row>
+
+
+        <v-toolbar density="compact">
+         <v-toolbar-title>
+          <v-icon>mdi-party-popper</v-icon> WordParty
+         </v-toolbar-title>
+        </v-toolbar>
+        <v-row v-for="(item, index) in talk2Array(value.img)" :key="index" no-gutters>
+         <v-col>
+          <v-sheet class="pr-4">
+           <v-text-field v-model="item[0]" outlined label="message" dense>
+            <v-tooltip activator="parent" location="bottom">発火するWordParty</v-tooltip>
+           </v-text-field>
+          </v-sheet>
+         </v-col>
+         <v-col cols="auto">
+          <v-sheet>
+           <v-text-field type="number" v-model="item[1]" label="秒数" min="-2" max="30" step="0.1">
+            <v-tooltip activator="parent" location="bottom">WordPartyを発火するまでの待機時間(秒)</v-tooltip>
+           </v-text-field>
+          </v-sheet>
+         </v-col>
+        </v-row>
+        <v-row no-gutters>
+         <v-col>
+          <v-sheet class="pb-10">
+           <v-btn block color="secondary" @click="value.img.push(['',0])">
+            <v-icon>mdi-plus-circle-outline</v-icon>
+            <v-tooltip activator="parent" location="bottom">WordPartyを追加する</v-tooltip>
+           </v-btn>
+          </v-sheet>
+         </v-col>
+        </v-row>
+       </v-card-text>
+      </v-card>
+     </v-dialog>
+     -->
+
+
+          <!--
 
                 <v-row>
 
@@ -311,10 +385,8 @@
                     :images_dir="images_dir" @selected="handleCOLOR('BASIC_IMAGES',index, 'img', $event)">
                   </d_images>
                 -->
-                </v-row>
-              </v-card-text>
-            </v-card>
-          </v-dialog>
+
+
 
 
           <!--
