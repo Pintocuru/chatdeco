@@ -1,18 +1,17 @@
 ////////////////////////////////////////////////////////////
-// 初見判定ちゃん First Counter for わんコメ v0.3 240403
+// スイカ🍉ジェネレーター Gousei Suika Generator for わんコメ v0.1 240603
 ////////////////////////////////////////////////////////////
 
-// テストスイッチ
-// 0:OFF 1:こんにちは 2:久しぶり 3:初見
-const testSwitch = DATAOBJ.PREFERENCES.testSwitch;
-// 投稿する枠のID(配信枠が複数あり、投稿先を指定したい場合。
-// 枠名で右クリックをすると、IDをコピーが出ますので、それを貼り付けて下さい)
-// 枠が1つの場合、またはわからない場合は空白でOKです。
-let activeFrameId = DATAOBJ.PREFERENCES.activeFrameId;
 // コメントしてからBotが反応するまでの遅延(ミリ秒)、小さすぎるとBotが機能しない場合があります
-const basicdelay = DATAOBJ.PREFERENCES.basicdelay;
-// ギフト対応(0:OFF 1:ON)
-const gift_switch = DATAOBJ.COMMON_SWITCH.gift;
+const basicdelay = 1500;
+
+// コメントするキャラクター設定
+const CHARACTER = {
+  // 合成大西瓜(スイカゲーム)
+  Suika: { name: "", icon: "" },
+  // イカゲーム
+  오징어: { name: "", icon: "" },
+}
 
 
 const LIMIT = 30;
@@ -23,37 +22,15 @@ const app = Vue.createApp({
   data() {
     return {
       comments: [],
-      isHidden: false,
-      waitingList: [],
+      visit: { ID0: { num: 0 }, }, // コメントしたユーザー情報
+      score: [
+        { name: 'おふとん', score: 2000 },
+        { name: 'もこもこ', score: 1800 },
+        { name: 'じゅん', score: 1600 },
+      ],
     };
   },
-  methods: {
-    // OBSの非表示を監視
-    isHiddenStatus() {
-      return this.isHidden;
-    },
-  },
-  async created() {
-    // Xmin毎にコメント
-    const min = Math.max(DATAOBJ.COMMON_SWITCH.timer || 0.99, 0.99);
-    if (min >= 1) { await posttime(); }
-    const timer = setInterval(async () => {
-      if (min >= 1) { await posttime(); }
-    }, min * 60 * 1000);
-  },
-  beforeDestroy() {
-    // タイマーを停止
-    clearInterval(this.timer);
-  },
   mounted() {
-    // 表示時間
-    const WAIT_DURATION = OneSDK.getStyleVariable("--lcv-wait-duration", 100, parseInt);
-    const INTERVAL = OneSDK.getStyleVariable("--lcv-enter-duration", 160, parseInt) + WAIT_DURATION;
-    const LIFE_TIME = OneSDK.getStyleVariable("--lcv-lifetime", 20000, parseInt) + WAIT_DURATION;
-    // CHARACTER のキー名を取得
-    const CHARACTERkeys = Object.keys(DATAOBJ.CHARACTER);
-
-    commentIndex = 0;
     OneSDK.setup({
       mode: "diff",
       commentLimit: LIMIT,
@@ -63,61 +40,41 @@ const app = Vue.createApp({
     OneSDK.subscribe({
       action: "comments",
       callback: (comments) => {
-        // OBS・ブラウザが非表示ならreturn
-        if (this.isHidden) { return; }
         const now = new Date(); // 時間取得
         comments.forEach((comment) => {
+          // 名前check
+          syokencheck(comment)
+
+          // ユーザーのDeathがtrueならreturn
+          if (deathcheck(comment)) return
+
+          // 再読み込みのコメントには反応せず、直近のコメントにだけ反応させる
+          // FirstCounterでないなら、おみくじ判定
           const timestamp = new Date(comment.data.timestamp);
           const diff = now - timestamp;
-          // 再読み込みのコメントには反応せず、直近のコメントにだけ反応させる
           if (diff < 500 && comment.data.userId !== "FirstCounter") {
             // インスタンス発行
             const ins = new commentins(comment);
-            // 初見check
-            ins.syoken();
-          }
-          // FirstCounterを表示/nightbot_switchが1ならNightbotも表示
-          if (comment.length !== 0 && (comment.data.userId === "FirstCounter" | CHARACTERkeys.includes(comment.data.name))) {
-            // コメントしたキャラに合わせて、commentにcssデータを注入
-            comment.css = DATAOBJ.CHARACTER[comment.data.name];
-            queue.push(...comments);
-            // 初見判定ちゃんでないなら、このタイミングでキャラクターを出す
-            if (comment.data.userId !== "FirstCounter") {
-              post_WordParty([{ [DATAOBJ.CHARACTER[comment.data.name].defaultchara]: -5000 }])
+            // おみくじcheck
+            const omi = ins.omiset();
+
+            // おみくじ発火
+            if (omi) {
+              // おみくじ結果を発火後、ポイントを取得
+              const POINT = ins.omikuji(omi);
+
+              // POINTがスコア
+
+              // スコア更新ならハイスコア情報を発火
+
+              // POINTが0なら、ユーザーにdeathを付与する
+
             }
           }
         });
       },
     });
-    // 参加型管理を監視
-    let cache = new Map()
-    commentIndex_wait = 0
-    OneSDK.subscribe({
-      action: 'waitingList',
-      callback: (waitingList) => {
-        const newCache = new Map()
-        waitingList.forEach(List => {
-          const index = cache.get(List.id)
-          if (isNaN(index)) {
-            // 新しく参加希望があるなら反応させる
-            const obj = GetMessage({ user: List.username }, "waiting");
-            if (obj) {
-              if (!obj.img) { obj.img = DATAOBJ.CHARACTER[obj.chara].defaultchara }
-              post_WordParty(obj.img);
-              post_onecome(obj.chara, obj.message);
-            }
-            List.commentIndex = commentIndex_wait
-            newCache.set(List.id, commentIndex_wait)
-            ++commentIndex_wait
-          } else {
-            List.commentIndex = index
-            newCache.set(List.id, index)
-          }
-        })
-        cache = newCache
-        this.waitingList = waitingList
-      }
-    });
+
     // コメントを定期的に表示し、一定時間経過後に自動的に削除する
     let time = 0;
     let plustime = 0;
@@ -139,6 +96,35 @@ const app = Vue.createApp({
     };
     OneSDK.connect();
     check();
+  },
+  methods: {
+    // visitに名前がなければ名前を記録する
+    syokencheck(comment) {
+      // metaがないテストコメント、externalはreturn
+      if ( !comment.meta || comment.data.liveId === "external") { return; }
+
+      const userId = comment.data.userId;
+      const userName = comment.data.name;
+
+      // visitに名前がなければ名前を記録する
+      if (!this.visit[userId]) {
+        this.visit[userId] = { name: userName };
+      } else {
+        // ユーザーIDがすでに存在する場合は、名前を上書きする
+        this.visit[userId].name = userName;
+      }
+    },
+    // visitにdeathがあるかcheck
+    deathcheck(comment) {
+      // metaがないテストコメント、externalは常時false
+      if (!comment.meta || comment.data.liveId === "external") { return false }
+
+      // deathプロパティが存在しないならfalse あるならtrueを返す
+      const userId = comment.data.userId;
+      if (!this.visit[userId]) return false;
+      return !!this.visit[userId].death;
+    },
+
   },
 });
 OneSDK.ready().then(() => {
@@ -207,77 +193,208 @@ class commentins {
   constructor(comment) {
     this.comment = comment;
   }
-  syoken() {
-    // 初見判定ちゃんは弾く
+  // おみくじ判定
+  omiset() {
+    // FirstCounterは弾く
     if (this.comment.data.userId == "FirstCounter") return;
-    // わんコメのコメントテスターであれば、仮のmetaデータを入れる
-    const meta = this.comment.meta || { interval: 99999, tc: 10, no: 2 };
-    let mode;
-    let price = 0;
-    // THRESHOLDが1日未満なら「久しぶり」が機能しない
-    const THRESHOLD = 1000 * 60 * 60 * 24 * (DATAOBJ.COMMON_SWITCH.greeting_again || 0);
-    const again_flag = THRESHOLD < 1000 * 60 * 60 * 24 ? 0 : 1;
 
-    // ギフト(最も優先される)
-    if (this.comment.data.price && gift_switch) {
-      mode = "gift";
-      price = this.comment.data.price
-      // unitが$ならpriceを100倍(えっ、1ドル100円ですか?)
-      if ((this.comment.data.unit === "$" || 0)) price *= 100;
+    // 変数の宣言 負荷軽減のため、コメントは通常と短縮版を用意する
+    let ID, mode;
+    const comment = this.comment.data.comment;
+    const come = this.comment.data.comment.substring(0, 15);
 
-      // おみくじモード(初見判定よりもおみくじが優先される)
+    // ID:1 合成大西瓜
+    if (
+      come.startsWith("西瓜") ||
+      come.startsWith("すいか") ||
+      come.startsWith("スイカ") ||
+      come === "🍉" ||
+      comment.includes("合成大西瓜") ||
+      comment.includes("スイカゲーム")
+    ) {
+      ID = 1; mode = 0;
+      
+/*
+      // ID:1-1 カボチャゲーム
+    } else if (
+      come.startsWith("南瓜") ||
+      come.startsWith("かぼちゃ") ||
+      come.startsWith("カボチャ") ||
+      come === "🎃"
+    ) {
+      ID = 1; mode = 1;
+
+      // ID:2 クジラゲーム
+    } else if (
+      come.startsWith("クジラ") ||
+      come.startsWith("くじら") ||
+      come.startsWith("鯨") ||
+      come === "🐋" ||
+      come === "🐳"
+    ) {
+      ID = 2; mode = 0;
+
+      // ID:3 北海道ゲーム
+      // ID:4 お金ゲーム
+      // ↑今後追加予定
+
+      // ID:98 惑星ゲーム
+    } else if (
+      come.startsWith("惑星") ||
+      come === "🪐" ||
+      come === "🌍️" ||
+      come === "🌎️" ||
+      come === "🌏️" ||
+      come === "☀" ||
+      come === "🌞"
+    ) {
+      ID = 98; mode = 0;
+*/
+      // ID:99 イカゲーム
+    } else if (
+      come === "イカゲーム"
+    ) {
+      ID = 99; mode = 0;
+
+      // おみくじでなければ終了
     } else {
-      mode = (function (comment) {
-        const obj = DATAOBJ.OMIKUJI_SWITCH || {};
-        const mode = Object.keys(obj).find(key => obj[key].test(comment));
-        return mode || undefined;
-      })(this.comment.data.comment);
+      return;
     }
+    // IDとmodeを返す
+    return { ID: ID, mode: mode };
+  }
 
-    // 該当するおみくじがなければ初見判定
-    if (!mode) {
-      // meta.intervalが0なら初見
-      if (meta?.interval === 0 && DATAOBJ.COMMON_SWITCH.greeting_syoken || testSwitch === 3) {
-        mode = "syoken";
-
-        // 初見ではないのに初見と言う奴に贈る言葉(初回から5回までは無効)
-      } else if (this.comment.data.comment.includes("初見") && (!meta || meta.tc > 5) && DATAOBJ.COMMON_SWITCH.greeting_sagi) {
-        mode = "syoken_sagi";
-
-        // meta.intervalが1000*60*60*24*day以上なら久しぶり
-      } else if (again_flag && (meta?.interval || 0) > THRESHOLD || testSwitch === 2) {
-        mode = "again";
-
-        // meta.noが1なら今日始めて
-      } else if ((meta?.no || 0) === 1 || testSwitch === 1) {
-        mode = "hi";
-
-        // そうでないならreturn
-      } else {
-        return;
-      }
-    }
-    // botがコメントをする
-    const user = this.comment.data.displayName || "名無しさん"; // 名前
-    const tc = (this.comment.meta && this.comment.meta.tc) || 0; // コメント回数
-    const obj = GetMessage({ user: user, tc: tc }, mode, price);
-
-    // コメント無効化等でundefinedになってないなら表示
-    if (obj) {
-      if (!obj.img) { obj.img = DATAOBJ.CHARACTER[obj.chara].defaultchara }
-      post_WordParty(obj.img);
-      post_onecome(obj.chara, obj.message);
-    }
+  // ID**のおみくじファンクションを実行
+  omikuji(omi) {
+    const User = this.comment.data.displayName;
+    const functions = window[`ID${omi.ID}`]; // 関数を直接取得
+    return functions?.call(null, User, omi.mode); // 関数を実行する
   }
 }
 
+// ID:1 合成大西瓜 
+function ID1(User, mode = 0) {
 
-// タイマー機能
-async function posttime() {
-  const obj = GetMessage({}, "timer");
-  post_WordParty(obj.img || (DATAOBJ.CHARACTER[obj.chara]?.defaultchara));
-  post_onecome(obj.chara, obj.message);
+  // 演出用
+  let WORDARR = []
+
+  // 1.いちご・ぶどう・デコポン・かき・りんごの抽選
+  const farfruits = [
+    // 🍓いちご：3点(2/3:15回)
+    { chance: 67, times: 15, points: 3, party:"🍓"},
+    // 🍇ぶどう：10点(1/2:15回)
+    { chance: 50, times: 15, points: 10, party: "🍇" },
+    // 🍊デコポン：30点(1/2:10回)
+    { chance: 50, times: 10, points: 30, party: "🍊" },
+    // 🦪かき：100点(1/3:8回)
+    { chance: 50, times: 8, points: 100, party: "🦪" },
+    // 🍎りんご：200点(2/3:5回)
+    { chance: 67, times: 5, points: 200, party: "🍎" },
+  ];
+  let POINT = playGachaGame(farfruits);
+
+  // 1次：いちご～りんごの抽選
+  function playGachaGame(gachas) {
+    let totalPoints = 0;
+    // ポイントの
+    for (const { chance, times, points, party } of gachas) {
+      const { pointsEarned, wins } = playGacha(chance, times, points);
+      totalPoints += pointsEarned;
+      // winsの半分を切り捨てて、その数だけWORDARRに絵文字を追加する
+      const halfWins = Math.floor(wins / 2);
+      for (let i = 0; i < halfWins; i++) {
+        WORDARR.push([party, 0]);
+      }
+    }
+    return totalPoints;
+  }
+  // ↑の1回毎の抽選
+  function playGacha(chance, times, points) {
+    let pointsEarned = 0;
+    let wins = 0;
+    for (let i = 0; i < times; i++) {
+      if (Math.random() * 100 < chance) {
+        pointsEarned += points;
+        wins++;
+      }
+    }
+    return { pointsEarned, wins };
+  }
+
+  // 2.ライフ制(❤5)当選時得点を足しライフ減少。なしから順次判定、0になるまで繰り返す
+  let life = 5;
+  const secfruits = [
+    // 🍐なし：500点(1/4:-1)
+    { chance: 25, points: 300, damage: 1, party: "🍐" },
+    // 🍍パイナップル：600点(1/4:-1)
+    { chance: 25, points: 400, damage: 1, party: "🍍" },
+    // 🍑もも：800点(1/3:-2)
+    { chance: 33, points: 500, damage: 2, party: "🍑" },
+    // 🍈メロン：1000点(1/3:-2)
+    { chance: 33, points: 700, damage: 2, party: "🍈" },
+    // 🍉スイカ：1500点(1/2:-3)
+    { chance: 50, points: 1000, damage: 3, party: "🍉" },
+    // 🍉🍉ダブル：3000点(1/1:-0)
+    { chance: 100, points: 2000, damage: 0, party: "🍉" },
+  ];
+
+  while (life > 0) {
+    for (const { chance, points: pointsToAdd, damage, party } of secfruits) {
+      // 当選時:得点を計算し🍐なしへ戻る
+      if (chance > Math.random() * 100) {
+        POINT += pointsToAdd;
+        life -= damage;
+        WORDARR.push([party, 0]); // 該当するフルーツを落とす
+        break;
+
+     // 非当選時:chanceを参照にfruitsを落とす
+     } else if (chance < Math.random() * 50) {
+        WORDARR.push([party, 0]);
+      }
+    }
+  }
+
+  // 結果をコメント表示、returnでポイントを返す
+  post_WordParty(WORDARR)
+  post_onecome("Suika", [[`${User}の得点は ${POINT}Point!`, 5]])
+  return POINT
+
 }
+
+// ID:99 イカゲーム 
+function ID99(User, mode = 0) {
+
+  // 1/456で勝利(45,600,000,000pt)、それ以外は0pt
+  let MSG 
+  let POINT = 0
+  const ran = (Math.random() * 456) | 0;
+  if (ran === 0){
+    MSG = `${User}はイカゲームで勝利し、スイカゲームでは到底得られないスコア「45600000000」を獲得した。`
+    POINT = 45600000000
+  } else if(ran < 20){
+    MSG = `${User}のスイカはナイフで執拗に抉られ、真っ赤な汁を吹き出して割れた。`
+  } else if (ran < 50) {
+    MSG = `${User}のスイカは空を踏み抜き、地面に叩きつけられて割れた。`
+  } else if (ran < 100) {
+    MSG = `${User}のスイカは偽物をつかまされ、果てには自らスイカを割った。`
+  } else if (ran < 150) {
+    MSG = `${User}のスイカは抵抗虚しく、奈落の底に引きずれ込まれ割れた。`
+  } else if (ran < 200) {
+    MSG = `${User}のスイカはキャンディーを激しく叩きつけられ消滅した。`
+  } else if (ran < 280) {
+    MSG = `${User}のスイカはガリガリと針で突き刺され、真っ赤な汁を吹き出して割れた。`
+  } else if (ran < 350) {
+    MSG = `${User}のスイカは転がり落ち、壁に激突して割れた。`
+  } else  {
+    MSG = `${User}のスイカは他のスイカの重さに耐えられず、押しつぶされて割れた。`
+  }
+
+  // 結果をコメント表示、returnでポイントを返す
+  post_onecome("오징어", [[MSG, 5]])
+  return POINT
+}
+
+
 
 // onecome
 // activeFrameIdが空なら、IDを取得する
@@ -306,13 +423,13 @@ async function post_onecome_go(message, waitTime, chara) {
   // ID生成(コメントが上書きされないためのもの)
   const id = new Date().getTime().toString() + Math.floor(Math.random() * 1000000)
   // iconががあるなら、アイコンを追加
-  const charaicon = DATAOBJ.CHARACTER[chara]?.icon || "";
+  const charaicon = CHARACTER[chara]?.icon || "";
 
   // HTTP POST
   await delaytime(waitTime);
   const onecome = {
     service: { id: activeFrameId, },
-    comment: { userId: "FirstCounter", id: id, name: chara, comment: message, profileImage: charaicon },
+    comment: { userId: "FirstCounter", id: id, name: CHARACTER[chara].name, comment: message, profileImage: charaicon },
   };
   OneSDK.post("http://localhost:11180/api/comments", onecome);
 }
