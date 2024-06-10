@@ -4,29 +4,47 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="referrer" content="no-referrer" />
+  <link href="https://fonts.googleapis.com/css2?family=RocknRoll+One&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Yusei+Magic&display=swap" rel="stylesheet">
+
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+P+One&family=Monomaniac+One&family=Yusei+Magic&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="./style.css" />
 </head>
 
 <body hidden>
   <div id="container" class="container">
-    <transition-group class="comments" name="comment" tag="div">
-      <div class="comment" v-for="(comment, index) in comments"
-        :style="comment.css" :key="comment.data.id" :data-user="comment.data.name">
-        <div class="comment-block">
-          <div class="name">
-            {{comment.data.displayName}}
-          </div>
-          <div class="comment-body">
-            <div class="comment-text" v-html="comment.data.comment"></div>
-          </div>
-        </div>
+      <div v-if="showCommentflag" class="bubble">
+        <div class="bubble_title">スコア</div>
+        <div class="bubble_score">{{showComment.score}}</div>
+        <div class ="bubble_name">{{showComment.name}} </div>
       </div>
-    </transition-group>
+    <div class="score-ranking">
+      <div class="ranking-title">🍉<span class="ranking-title2">スイカランキング</span>🍉</div>
+      <ul>
+        <li v-for="(player, index) in players" :key="index">
+          <template v-if="index < 3"> <!-- 1位から3位までの場合 -->
+            <img :src="`img/image_${index + 1}.png`" :alt="`${index + 1}位の画像`" class="ranking-image">
+          </template>
+          <template v-else> <!-- 4位以降の場合 -->
+            <span class="ranking-text">[{{ index + 1 }}]</span>
+          </template>
+          <span class="player-info">
+            <span class="player-score">{{ player.score }} </span>
+            <span class="player-name">({{ player.name }})</span>
+          </span>
+        </li>
+      </ul>
+          <div class="totals">
+             Average: {{ averagePoint }} ( {{ totalCount }} / {{ totalPoint }} )
+          </div>
+    </div>
   </div>
   <script src="../__origin/js/vue.min.js"></script>
   <script src="../__origin/js/onesdk.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.0.7/purify.js"></script>
-  <script src="./userData.js"></script>
   <script src="./script.js"></script>
 </body>
 

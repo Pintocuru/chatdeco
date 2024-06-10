@@ -1,3 +1,153 @@
 @import url('../__origin/css/common.css');
 @import url('../__origin/css/theme/basic.css');
-@import url('./FirstCounter.css');
+
+
+.bubble {
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.7));
+  border-radius: 50%;
+  box-shadow: inset 0 0 100px rgba(255, 255, 255, 1), inset 0 0 100px rgba(207, 235, 247, 0.8), 0 0 60px rgba(255, 255, 255, 0.7);
+  animation: bubble 4s ease-in-out infinite alternate;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  white-space: nowrap;
+  margin: 0 auto;
+}
+
+@keyframes bubble {
+  0% {
+    transform: translateY(30px);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.bubble_title {
+  margin-bottom: 5px;
+  font-family: "RocknRoll One", sans-serif;
+  font-size: 48px;
+  color: #f0f0f0;
+  -webkit-text-stroke: 1px #B3843A;
+}
+
+.bubble_score {
+  margin: -25px;
+  font-family: "Mochiy Pop P One", sans-serif;
+  font-size: 80px;
+  background: linear-gradient(180deg, #fff, #ffcc00);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  -webkit-text-stroke: 3px #B3843A;
+}
+
+.bubble_name {
+  font-family: 'RocknRoll One', sans-serif;
+  font-size: 48px;
+  color: #fff;
+  -webkit-text-stroke: 1px #B3843A;
+}
+
+
+.score-ranking {
+  background-color: #ffeeb3;
+  border: 3px solid #ffcc00;
+  border-radius: 50px;
+  margin: 0 20px;
+  padding: 20px;
+  font-size: 36px;
+  font-family: 'RocknRoll One', sans-serif;
+}
+
+.ranking-title {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.ranking-title2 {
+  color: #f5E5BC;
+  text-shadow:
+    -3px -3px 3px #B3843A,
+    3px -3px 3px #B3843A,
+    -3px 3px 3px #B3843A,
+    3px 3px 3px #B3843A;
+}
+
+.score-ranking ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.score-ranking li {
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
+  font-weight: bold;
+}
+
+/* スコア背景:1位 */
+.score-ranking li:nth-child(1) {
+  color: #B99F4F;
+  background: linear-gradient(to right, #F4D777, #FFF2C6);
+}
+
+/* スコア背景:2位 */
+.score-ranking li:nth-child(2) {
+  color: #5380B3;
+  background: linear-gradient(to right, #A1BCCC, #D5E5F2);
+}
+
+/* スコア背景:3位 */
+.score-ranking li:nth-child(3) {
+  color: #BC7851;
+  background: linear-gradient(to right, #F0B16E, #FFE1BD);
+}
+
+/* スコア背景:4位以降 */
+.score-ranking li:nth-child(n+4) {
+  color: #4D6F8C;
+  background: linear-gradient(to right, #D9E9F7, #F2F9FF);
+}
+
+/* スコアの順位画像 */
+.ranking-image {
+  display: inline-block;
+  width: 80px;
+  height: 80px;
+  margin-right: 20px;
+}
+
+/* スコアの文字部分 */
+.player-info {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+/* スコア */
+.player-score {
+  font-size: 1em;
+}
+
+/* スコア名前 */
+.player-name {
+  font-size: 0.7em;
+}
+
+/* 下部:スコア */
+.totals {
+  padding: 0;
+  margin: 0;
+  font-size: 0.7em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
